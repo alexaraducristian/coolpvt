@@ -18,6 +18,7 @@ const consumatori = [
   { id: 'uscator', name: 'Uscător rufe', putere: 1000, ore: 1, buc: 1 },
   { id: 'cafea', name: 'Filtru cafea / Espressor', putere: 1000, ore: 1, buc: 1 },
 ];
+const defaultChecked = ['led', 'centrala', 'boiler', 'frigider', 'masina-spalat', 'televizor', 'cafea'];
 ---
 
 <SimulatorLayout title="Consumatori — CoolPVT" activeStep="consumatori">
@@ -40,7 +41,7 @@ const consumatori = [
       <tbody>
         {consumatori.map(c => (
           <tr data-id={c.id}>
-            <td><input type="checkbox" class="chk-activ" /></td>
+            <td><input type="checkbox" class="chk-activ" checked={defaultChecked.includes(c.id)} /></td>
             <td>{c.name}</td>
             <td><input type="number" class="inp-buc" value={c.buc} min="0" max="50" /></td>
             <td><input type="number" class="inp-putere" value={c.putere} min="0" step="10" /></td>
@@ -98,6 +99,9 @@ const consumatori = [
     inp.addEventListener('change', recalculate);
     inp.addEventListener('input', recalculate);
   });
+
+  // Calcul initial pentru consumatorii pre-selectati
+  recalculate();
 
   document.getElementById('btn-confirma')!.addEventListener('click', () => {
     recalculate();

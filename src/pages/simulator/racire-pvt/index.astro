@@ -56,31 +56,60 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
 </SimulatorLayout>
 
 <script>
-  const tempIesireBeton: Record<string, number[]> = {
-    mai: [21.5,24,27,29,31,34,34,32.5,30.5,27.5,25,22],
-    iun: [25,28,30,34,38,39,41,42,41,37,32,29],
-    iul: [25,29,34,38,44,47,50,52,50,46,38,33],
-    aug: [27,30,35,38,42,45,44,43,42,38,33,30],
-    sept: [23,25,29,31,35,39,39,38,35,32,28,23],
+  // Date temperatura iesire apa pe ora (12 ore/zi) per tip acoperis
+  // Extras din RacirePVT.cs - aplicatia originala
+  const tempData: Record<string, Record<string, number[]>> = {
+    beton: {
+      mai: [21.5,24,27,29,31,34,34,32.5,30.5,27.5,25,22],
+      iun: [25,28,30,34,38,39,41,42,41,37,32,29],
+      iul: [25,29,34,38,44,47,50,52,50,46,38,33],
+      aug: [27,30,35,38,42,45,44,43,42,38,33,30],
+      sept: [23,25,29,31,35,39,39,38,35,32,28,23],
+    },
+    tabla: {
+      mai: [23,26,29,31,33,36,36,34.5,32.5,29.5,27,24],
+      iun: [27,30,33,37,41,42,44,45,44,40,35,31],
+      iul: [28,32,37,41,47,50,53,55,53,49,41,36],
+      aug: [29,33,38,41,45,48,47,46,45,41,36,32],
+      sept: [25,27,31,34,38,42,42,41,38,35,30,25],
+    },
+    lemn: {
+      mai: [20,22.5,25,27,29,31.5,31.5,30,28.5,26,23.5,20.5],
+      iun: [23,26,28,32,35,36,38,39,38,34,30,27],
+      iul: [23,27,31,35,41,44,47,49,47,43,36,31],
+      aug: [25,28,32,35,39,42,41,40,39,36,31,28],
+      sept: [21,23,27,29,33,36,36,35,33,30,26,21],
+    },
+  };
+
+  // Coeficient debit efectiv per diametru teava (raport suprafata contact)
+  const coefDiametru: Record<string, number> = {
+    '15': 1.0,
+    '18': 1.2,
+    '22': 1.47,
   };
 
   document.getElementById('btn-calc-pvt')!.addEventListener('click', () => {
+    const tipAcoperis = (document.getElementById('tip-acoperis') as HTMLSelectElement).value;
+    const diametru = (document.getElementById('diametru-teava') as HTMLSelectElement).value;
     const debit = parseFloat((document.getElementById('debit-apa') as HTMLInputElement).value);
     const tIntrare = parseFloat((document.getElementById('temp-apa-intrare') as HTMLInputElement).value);
     const nrPVT = parseFloat((document.getElementById('nr-pvt') as HTMLInputElement).value);
     const randPVT = parseFloat((document.getElementById('randament-pvt') as HTMLInputElement).value);
     const cApa = 4.186; // kJ/(kg·K)
+    const coefD = coefDiametru[diametru] || 1.0;
+    const temps = tempData[tipAcoperis] || tempData['beton'];
     const luni = ['mai','iun','iul','aug','sept'];
     const numelLuni = ['Mai','Iunie','Iulie','August','Septembrie'];
     let totalKwh = 0;
     let html = '';
 
     luni.forEach((luna, idx) => {
-      const temps = tempIesireBeton[luna];
+      const tempOre = temps[luna];
       let eZiKJ = 0;
       let tMedie = 0;
-      temps.forEach(t => { eZiKJ += debit * cApa * (t - tIntrare); tMedie += t; });
-      tMedie /= temps.length;
+      tempOre.forEach(t => { eZiKJ += debit * coefD * cApa * (t - tIntrare); tMedie += t; });
+      tMedie /= tempOre.length;
       const eZiKJTotal = eZiKJ * nrPVT * randPVT;
       const eLunaKWh = (eZiKJTotal / 3600) * 30;
       totalKwh += eLunaKWh;
