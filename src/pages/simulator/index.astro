@@ -1,305 +1,287 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
 ---
 
-<Layout title="Simulator — CoolPVT">
-  <section class="simulator-page">
-    <h1>Simulator PVT</h1>
-    <p class="intro">Dimensionarea sistemului fotovoltaic termic se face în pași simpli.</p>
+<SimulatorLayout title="Dimensionare PV — CoolPVT" activeStep="dimensionare">
+  <h1>Dimensionare Sistem Fotovoltaic</h1>
+  <p class="intro">Completați pașii de mai jos pentru dimensionarea sistemului PV.</p>
 
-    <div class="wizard">
-      <div class="step">
-        <div class="step-header">
-          <span class="step-number">1</span>
-          <h2>Selectare locație</h2>
-        </div>
-        <div class="step-content">
-          <label for="judet">Județ / Localitate:</label>
-          <select id="judet">
-            <option value="iasi">Iași</option>
-            <option value="bucuresti">București</option>
-            <option value="cluj">Cluj</option>
-            <option value="constanta">Constanța</option>
-            <option value="craiova">Craiova</option>
-            <option value="galati">Galați</option>
-            <option value="timisoara">Timișoara</option>
-          </select>
-        </div>
+  <form id="form-dimensionare" class="form-grid">
+    <!-- Pas 1: Modalitate dimensionare -->
+    <div class="card">
+      <h2><span class="step-num">1</span> Modalitate determinare consum</h2>
+      <div class="field-group">
+        <label><input type="radio" name="modalitate" value="consum" checked /> Consum lunar estimat (kWh)</label>
+        <label><input type="radio" name="modalitate" value="putere" /> Putere instalată dorită (kWp)</label>
+        <label><input type="radio" name="modalitate" value="receptoare" /> Receptoare electrice (detaliat)</label>
       </div>
-
-      <div class="step">
-        <div class="step-header">
-          <span class="step-number">2</span>
-          <h2>Perioadă dimensionare</h2>
-        </div>
-        <div class="step-content">
-          <label for="perioada">Perioadă:</label>
-          <select id="perioada">
-            <option value="vara">VARA</option>
-            <option value="iarna">IARNA</option>
-            <option value="anual" selected>ANUAL</option>
-          </select>
-        </div>
+      <div id="input-consum" class="sub-field">
+        <label for="consum-lunar">Consum lunar [kWh/lună]:</label>
+        <input type="number" id="consum-lunar" value="300" min="0" step="10" />
       </div>
-
-      <div class="step">
-        <div class="step-header">
-          <span class="step-number">3</span>
-          <h2>Orientare panouri</h2>
-        </div>
-        <div class="step-content">
-          <label for="orientare">Orientare:</label>
-          <select id="orientare">
-            <option value="SUD">SUD</option>
-            <option value="SUD-EST">SUD-EST</option>
-            <option value="SUD-VEST">SUD-VEST</option>
-            <option value="EST">EST</option>
-            <option value="VEST">VEST</option>
-          </select>
-        </div>
+      <div id="input-putere" class="sub-field" style="display:none;">
+        <label for="putere-instalata">Putere instalată dorită [kWp]:</label>
+        <input type="number" id="putere-instalata" value="5" min="0" step="0.5" />
       </div>
-
-      <div class="step">
-        <div class="step-header">
-          <span class="step-number">4</span>
-          <h2>Unghi de înclinare</h2>
-        </div>
-        <div class="step-content">
-          <label for="unghi">Unghi (grade):</label>
-          <select id="unghi">
-            <option value="5">5°</option>
-            <option value="10">10°</option>
-            <option value="15">15°</option>
-            <option value="20">20°</option>
-            <option value="25">25°</option>
-            <option value="30">30°</option>
-            <option value="35" selected>35°</option>
-            <option value="40">40°</option>
-            <option value="45">45°</option>
-            <option value="50">50°</option>
-            <option value="55">55°</option>
-            <option value="60">60°</option>
-            <option value="65">65°</option>
-            <option value="70">70°</option>
-            <option value="75">75°</option>
-            <option value="80">80°</option>
-            <option value="85">85°</option>
-            <option value="90">90°</option>
-          </select>
-          <p class="hint" id="sugestie">Înclinare optimă = 35°</p>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-header">
-          <span class="step-number">5</span>
-          <h2>Consum energie</h2>
-        </div>
-        <div class="step-content">
-          <label for="consum">Consum lunar estimat (kWh):</label>
-          <input type="number" id="consum" value="300" min="0" step="10" />
-        </div>
-      </div>
-
-      <div class="actions">
-        <button id="btn-calculeaza" class="btn-primary">Calculează</button>
-      </div>
-
-      <div class="results" id="results" style="display: none;">
-        <h2>Rezultate</h2>
-        <div class="results-grid">
-          <div class="result-item">
-            <span class="result-label">Nr. panouri necesare</span>
-            <span class="result-value" id="res-panouri">—</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">Putere instalată</span>
-            <span class="result-value" id="res-putere">—</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">Suprafață totală</span>
-            <span class="result-value" id="res-suprafata">—</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">Energie produsă anual</span>
-            <span class="result-value" id="res-energie">—</span>
-          </div>
-        </div>
+      <div id="input-receptoare" class="sub-field" style="display:none;">
+        <p>Mergeți la pagina <a href="/coolpvt/simulator/consumatori/">Consumatori</a> pentru detaliere.</p>
       </div>
     </div>
-  </section>
-</Layout>
+
+    <!-- Pas 2: Perioada de dimensionare -->
+    <div class="card">
+      <h2><span class="step-num">2</span> Perioadă dimensionare</h2>
+      <select id="perioada">
+        <option value="VARA">VARA (producție maximă în Iunie)</option>
+        <option value="IARNA">IARNA (producție în Decembrie)</option>
+        <option value="ANUAL" selected>ANUAL (media anuală)</option>
+      </select>
+    </div>
+
+    <!-- Pas 3: Orientare -->
+    <div class="card">
+      <h2><span class="step-num">3</span> Orientare panouri fotovoltaice</h2>
+      <select id="orientare">
+        <option value="SUD" selected>SUD</option>
+        <option value="SUD-EST">SUD-EST</option>
+        <option value="SUD-VEST">SUD-VEST</option>
+        <option value="EST">EST</option>
+        <option value="VEST">VEST</option>
+      </select>
+    </div>
+
+    <!-- Pas 4: Unghi inclinare -->
+    <div class="card">
+      <h2><span class="step-num">4</span> Unghi de înclinare</h2>
+      <select id="unghi">
+        <option value="5">5°</option><option value="10">10°</option>
+        <option value="15">15°</option><option value="20">20°</option>
+        <option value="25">25°</option><option value="30">30°</option>
+        <option value="35" selected>35°</option><option value="40">40°</option>
+        <option value="45">45°</option><option value="50">50°</option>
+        <option value="55">55°</option><option value="60">60°</option>
+        <option value="65">65°</option><option value="70">70°</option>
+        <option value="75">75°</option><option value="80">80°</option>
+        <option value="85">85°</option><option value="90">90° (vertical)</option>
+      </select>
+      <p class="hint" id="sugestie-unghi">Înclinare optimă recomandată = 35°</p>
+    </div>
+
+    <!-- Pas 5: Selectare panou -->
+    <div class="card">
+      <h2><span class="step-num">5</span> Selectare panou fotovoltaic</h2>
+      <select id="panou-pv">
+        <option value="PV1" data-tip="Policristalin" data-putere="280" data-l="1.650" data-w="0.992" data-rand="17.11" data-deg="0.13">PV1 policristalin 280 Wp</option>
+        <option value="PV2" data-tip="Monocristalin" data-putere="305" data-l="1.640" data-w="0.992" data-rand="18.75" data-deg="0.13">PV2 monocristalin 305 Wp</option>
+        <option value="PV3" data-tip="Monocristalin" data-putere="395" data-l="1.684" data-w="1.000" data-rand="21.2" data-deg="0.13">PV3 monocristalin 395 Wp</option>
+        <option value="PV5" data-tip="Monocristalin" data-putere="310" data-l="1.640" data-w="0.992" data-rand="19.05" data-deg="0.11">PV5 monocristalin 310 Wp</option>
+        <option value="PV6" data-tip="Monocristalin" data-putere="380" data-l="1.769" data-w="1.052" data-rand="20.3" data-deg="0.13">PV6 monocristalin 380 Wp</option>
+        <option value="PV7" data-tip="Hibrid" data-putere="420" data-l="1.800" data-w="1.150" data-rand="25.3" data-deg="0.20">PV7 hibrid 420 Wp</option>
+        <option value="PV8" data-tip="Monocristalin" data-putere="425" data-l="2.100" data-w="1.040" data-rand="21.3" data-deg="0.13">PV8 monocristalin 425 Wp</option>
+        <option value="PVC4" data-tip="Monocristalin" data-putere="450" data-l="2.120" data-w="1.052" data-rand="20.2" data-deg="0.13" selected>PV C4 monocristalin 450 Wp</option>
+        <option value="PVC6" data-tip="Monocristalin" data-putere="460" data-l="2.120" data-w="1.052" data-rand="20.6" data-deg="0.13">PV C6 monocristalin 460 Wp</option>
+        <option value="PVC14" data-tip="Monocristalin" data-putere="500" data-l="2.108" data-w="1.048" data-rand="21.2" data-deg="0.13">PV C14 monocristalin 500 Wp</option>
+        <option value="PVC15" data-tip="Monocristalin" data-putere="545" data-l="2.108" data-w="1.048" data-rand="21.9" data-deg="0.13">PV C15 monocristalin 545 Wp</option>
+        <option value="PVC7" data-tip="Monocristalin" data-putere="640" data-l="2.384" data-w="1.303" data-rand="20.6" data-deg="0.13">PV C7 monocristalin 640 Wp</option>
+        <option value="PVC13" data-tip="Monocristalin" data-putere="670" data-l="2.384" data-w="1.303" data-rand="21.6" data-deg="0.13">PV C13 monocristalin 670 Wp</option>
+      </select>
+      <div class="panel-info" id="panel-info">
+        <span>Tip: <strong id="info-tip">Monocristalin</strong></span>
+        <span>Putere: <strong id="info-putere">450</strong> Wp</span>
+        <span>Dimensiuni: <strong id="info-dim">2.120 × 1.052</strong> m</span>
+        <span>Randament: <strong id="info-rand">20.2</strong>%</span>
+        <span>Suprafață: <strong id="info-suprafata">2.23</strong> m²</span>
+      </div>
+    </div>
+
+    <!-- Pas 6: Localitate -->
+    <div class="card">
+      <h2><span class="step-num">6</span> Localitate / Județ</h2>
+      <select id="judet">
+        <optgroup label="Regiunea NE">
+          <option value="iasi" selected>Iași</option>
+          <option value="iasi">Botoșani</option>
+          <option value="iasi">Suceava</option>
+          <option value="iasi">Neamț</option>
+          <option value="iasi">Bacău</option>
+          <option value="iasi">Vaslui</option>
+        </optgroup>
+        <optgroup label="Regiunea SE">
+          <option value="galati">Galați</option>
+          <option value="galati">Brăila</option>
+          <option value="galati">Vrancea</option>
+          <option value="galati">Buzău</option>
+          <option value="constanta">Constanța</option>
+          <option value="constanta">Tulcea</option>
+        </optgroup>
+        <optgroup label="Regiunea B-IF / SM">
+          <option value="bucuresti">București</option>
+          <option value="bucuresti">Ilfov</option>
+          <option value="bucuresti">Prahova</option>
+          <option value="bucuresti">Dâmbovița</option>
+          <option value="bucuresti">Călărași</option>
+          <option value="bucuresti">Teleorman</option>
+          <option value="bucuresti">Argeș</option>
+        </optgroup>
+        <optgroup label="Regiunea SV">
+          <option value="craiova">Dolj</option>
+          <option value="craiova">Olt</option>
+          <option value="craiova">Vâlcea</option>
+          <option value="craiova">Gorj</option>
+          <option value="craiova">Mehedinți</option>
+        </optgroup>
+        <optgroup label="Regiunea V">
+          <option value="timisoara">Timiș</option>
+          <option value="timisoara">Arad</option>
+          <option value="timisoara">Hunedoara</option>
+          <option value="timisoara">Caraș-Severin</option>
+        </optgroup>
+        <optgroup label="Regiunea NV / C">
+          <option value="cluj">Cluj</option>
+          <option value="cluj">Bihor</option>
+          <option value="cluj">Satu Mare</option>
+          <option value="cluj">Maramureș</option>
+          <option value="cluj">Sălaj</option>
+          <option value="cluj">Bistrița-Năsăud</option>
+          <option value="cluj">Alba</option>
+          <option value="cluj">Mureș</option>
+          <option value="cluj">Harghita</option>
+          <option value="cluj">Sibiu</option>
+          <option value="cluj">Brașov</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Pas 7: Opțiuni avansate -->
+    <div class="card">
+      <h2><span class="step-num">7</span> Opțiuni avansate</h2>
+      <div class="field-group">
+        <label><input type="checkbox" id="check-racire" /> Activare răcire PV</label>
+        <label><input type="checkbox" id="check-racire-pvt" /> Activare răcire PVT (termică)</label>
+        <label><input type="checkbox" id="check-dosar" /> Dosar prosumator</label>
+        <label><input type="checkbox" id="check-priza" /> Priză de pământ existentă</label>
+      </div>
+      <div class="sub-field">
+        <label for="randament-invertor">Randament invertor [0-1]:</label>
+        <input type="number" id="randament-invertor" value="0.97" min="0.8" max="1" step="0.01" />
+      </div>
+    </div>
+
+    <!-- Pas 8: Calculare -->
+    <div class="card card-action">
+      <h2><span class="step-num">8</span> Calculare</h2>
+      <button type="button" id="btn-calculeaza" class="btn-primary">Calculează Dimensionare</button>
+    </div>
+  </form>
+
+  <!-- Rezultate -->
+  <div class="results-panel" id="results" style="display:none;">
+    <h2>Rezultate Dimensionare</h2>
+    <div class="results-grid">
+      <div class="res-item"><span class="res-label">Nr. panouri fotovoltaice</span><span class="res-value" id="res-nr-panouri">—</span></div>
+      <div class="res-item"><span class="res-label">Putere instalată</span><span class="res-value" id="res-putere">—</span></div>
+      <div class="res-item"><span class="res-label">Suprafață totală panouri</span><span class="res-value" id="res-suprafata">—</span></div>
+      <div class="res-item"><span class="res-label">Energie produsă/an (Anul 1)</span><span class="res-value" id="res-energie-an1">—</span></div>
+      <div class="res-item"><span class="res-label">Energie produsă/an (Anul 20)</span><span class="res-value" id="res-energie-an20">—</span></div>
+      <div class="res-item"><span class="res-label">Energie produsă/lună (medie)</span><span class="res-value" id="res-energie-luna">—</span></div>
+    </div>
+    <div class="next-steps">
+      <p>Continuați cu:</p>
+      <a href="/coolpvt/simulator/calcul-electric/" class="btn-secondary">Calcul Electric →</a>
+      <a href="/coolpvt/simulator/economic/" class="btn-secondary">Analiză Economică →</a>
+    </div>
+  </div>
+</SimulatorLayout>
 
 <script>
-  document.getElementById('btn-calculeaza')?.addEventListener('click', () => {
-    const consum = parseFloat((document.getElementById('consum') as HTMLInputElement).value) || 300;
+  // Toggle modalitate consum
+  document.querySelectorAll('input[name="modalitate"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById('input-consum')!.style.display = (r as HTMLInputElement).value === 'consum' ? '' : 'none';
+      document.getElementById('input-putere')!.style.display = (r as HTMLInputElement).value === 'putere' ? '' : 'none';
+      document.getElementById('input-receptoare')!.style.display = (r as HTMLInputElement).value === 'receptoare' ? '' : 'none';
+    });
+  });
 
-    // Calcul simplificat de demonstrație
-    const energieZilnica = consum / 30;
-    const putereNecesara = energieZilnica / 4.5; // ore solare medii
-    const puterePanel = 0.45; // kWp per panou (450W)
-    const nrPanouri = Math.ceil(putereNecesara / puterePanel);
+  // Info panou
+  const panouSelect = document.getElementById('panou-pv') as HTMLSelectElement;
+  function updatePanelInfo() {
+    const opt = panouSelect.selectedOptions[0];
+    document.getElementById('info-tip')!.textContent = opt.dataset.tip || '';
+    document.getElementById('info-putere')!.textContent = opt.dataset.putere || '';
+    document.getElementById('info-dim')!.textContent = `${opt.dataset.l} × ${opt.dataset.w}`;
+    document.getElementById('info-rand')!.textContent = opt.dataset.rand || '';
+    const sup = (parseFloat(opt.dataset.l || '0') * parseFloat(opt.dataset.w || '0')).toFixed(2);
+    document.getElementById('info-suprafata')!.textContent = sup;
+  }
+  panouSelect.addEventListener('change', updatePanelInfo);
+  updatePanelInfo();
+
+  // Calcul dimensionare
+  document.getElementById('btn-calculeaza')!.addEventListener('click', () => {
+    const modalitate = (document.querySelector('input[name="modalitate"]:checked') as HTMLInputElement).value;
+    const consumLunar = parseFloat((document.getElementById('consum-lunar') as HTMLInputElement).value) || 300;
+    const putereDorita = parseFloat((document.getElementById('putere-instalata') as HTMLInputElement).value) || 5;
+    const randInvertor = parseFloat((document.getElementById('randament-invertor') as HTMLInputElement).value) || 0.97;
+    const opt = panouSelect.selectedOptions[0];
+    const puterePanel = parseFloat(opt.dataset.putere || '450') / 1000; // kWp
+    const randPV = parseFloat(opt.dataset.rand || '20') ;
+    const degAnual = parseFloat(opt.dataset.deg || '0.13');
+    const supPanel = parseFloat(opt.dataset.l || '2.1') * parseFloat(opt.dataset.w || '1.05');
+
+    let nrPanouri: number;
+    if (modalitate === 'putere') {
+      nrPanouri = Math.ceil(putereDorita / puterePanel);
+    } else {
+      const energieZilnica = consumLunar / 30;
+      const oreSolare = 4.5;
+      const putereNecesara = energieZilnica / oreSolare / randInvertor;
+      nrPanouri = Math.ceil(putereNecesara / puterePanel);
+    }
+
     const putereInstalata = nrPanouri * puterePanel;
-    const suprafata = nrPanouri * 2.1 * 1.05; // dimensiuni standard panou
-    const energieAnuala = putereInstalata * 1200; // kWh/kWp/an media România
+    const supTotala = nrPanouri * supPanel;
+    const energieAn1 = putereInstalata * 1200 * randInvertor;
+    const energieAn20 = energieAn1 * ((randPV - degAnual * 20) / randPV);
+    const energieLuna = energieAn1 / 12;
 
-    document.getElementById('res-panouri')!.textContent = `${nrPanouri} buc`;
+    document.getElementById('res-nr-panouri')!.textContent = `${nrPanouri} buc`;
     document.getElementById('res-putere')!.textContent = `${putereInstalata.toFixed(2)} kWp`;
-    document.getElementById('res-suprafata')!.textContent = `${suprafata.toFixed(1)} m²`;
-    document.getElementById('res-energie')!.textContent = `${energieAnuala.toFixed(0)} kWh/an`;
+    document.getElementById('res-suprafata')!.textContent = `${supTotala.toFixed(1)} m²`;
+    document.getElementById('res-energie-an1')!.textContent = `${energieAn1.toFixed(0)} kWh`;
+    document.getElementById('res-energie-an20')!.textContent = `${energieAn20.toFixed(0)} kWh`;
+    document.getElementById('res-energie-luna')!.textContent = `${energieLuna.toFixed(0)} kWh/lună`;
     document.getElementById('results')!.style.display = 'block';
+    document.getElementById('results')!.scrollIntoView({ behavior: 'smooth' });
   });
 </script>
 
 <style>
-  .simulator-page {
-    padding: 1rem 0;
-  }
-
-  .simulator-page h1 {
-    font-size: 2rem;
-    color: var(--color-primary-dark);
-    margin-bottom: 0.5rem;
-  }
-
-  .intro {
-    color: var(--color-text-muted);
-    margin-bottom: 2rem;
-  }
-
-  .wizard {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .step {
-    background: var(--color-surface);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    border: 1px solid #e2e8f0;
-  }
-
-  .step-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-
-  .step-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    background: var(--color-primary);
-    color: white;
-    border-radius: 50%;
-    font-weight: 700;
-    font-size: 0.9rem;
-  }
-
-  .step-header h2 {
-    font-size: 1.1rem;
-    color: var(--color-primary-dark);
-  }
-
-  .step-content {
-    padding-left: 2.75rem;
-  }
-
-  label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: var(--color-text);
-  }
-
-  select, input[type="number"] {
-    width: 100%;
-    max-width: 300px;
-    padding: 0.625rem 0.875rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 1rem;
-    background: white;
-    color: var(--color-text);
-  }
-
-  select:focus, input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
-  }
-
-  .hint {
-    margin-top: 0.5rem;
-    color: var(--color-accent);
-    font-weight: 500;
-    font-size: 0.9rem;
-  }
-
-  .actions {
-    text-align: center;
-    padding: 1rem 0;
-  }
-
-  .btn-primary {
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    padding: 0.875rem 2.5rem;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-  }
-
-  .btn-primary:hover {
-    background: var(--color-primary-dark);
-    transform: translateY(-1px);
-  }
-
-  .btn-primary:active {
-    transform: translateY(0);
-  }
-
-  .results {
-    background: #ecfdf5;
-    border: 1px solid #6ee7b7;
-    border-radius: 12px;
-    padding: 1.5rem;
-  }
-
-  .results h2 {
-    color: #065f46;
-    margin-bottom: 1rem;
-  }
-
-  .results-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-
-  .result-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .result-label {
-    font-size: 0.85rem;
-    color: #047857;
-    font-weight: 500;
-  }
-
-  .result-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #065f46;
-  }
+  h1 { font-size: 1.8rem; color: var(--color-primary-dark); margin-bottom: 0.5rem; }
+  .intro { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+  .form-grid { display: flex; flex-direction: column; gap: 1.25rem; }
+  .card { background: var(--color-surface); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+  .card h2 { font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--color-primary); color: white; border-radius: 50%; font-size: 0.85rem; font-weight: 700; }
+  .field-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .field-group label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+  .sub-field { margin-top: 0.75rem; }
+  .sub-field label { display: block; font-weight: 500; margin-bottom: 0.3rem; font-size: 0.9rem; }
+  select, input[type="number"] { width: 100%; max-width: 400px; padding: 0.5rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; }
+  select:focus, input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(26,86,219,0.1); }
+  .hint { margin-top: 0.5rem; color: var(--color-accent); font-weight: 600; font-size: 0.9rem; }
+  .panel-info { margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; color: var(--color-text-muted); }
+  .card-action { text-align: center; }
+  .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .btn-primary:hover { background: var(--color-primary-dark); }
+  .btn-secondary { display: inline-block; padding: 0.5rem 1rem; background: #f1f5f9; color: var(--color-primary); border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: background 0.2s; }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .results-panel { margin-top: 2rem; background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 12px; padding: 1.5rem; }
+  .results-panel h2 { color: #065f46; margin-bottom: 1rem; }
+  .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .res-item { display: flex; flex-direction: column; gap: 0.2rem; }
+  .res-label { font-size: 0.8rem; color: #047857; font-weight: 500; }
+  .res-value { font-size: 1.4rem; font-weight: 700; color: #065f46; }
+  .next-steps { border-top: 1px solid #a7f3d0; padding-top: 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .next-steps p { font-weight: 500; color: #065f46; }
 </style>

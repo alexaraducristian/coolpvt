@@ -1,0 +1,142 @@
+---
+import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
+---
+
+<SimulatorLayout title="Calcul Electric — CoolPVT" activeStep="calcul-electric">
+  <h1>Dimensionare Electrică</h1>
+  <p class="intro">Calcul invertor, tensiuni DC, secțiuni cabluri și protecții electrice.</p>
+
+  <div class="card">
+    <h2>Date intrare</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label for="pinst">Putere instalată [kWp]:</label>
+        <input type="number" id="pinst" value="5" step="0.1" />
+      </div>
+      <div class="field">
+        <label for="npv">Nr. panouri în sistem:</label>
+        <input type="number" id="npv" value="11" min="1" />
+      </div>
+      <div class="field">
+        <label for="npserie">Nr. panouri în serie (per șir):</label>
+        <input type="number" id="npserie" value="11" min="1" />
+      </div>
+      <div class="field">
+        <label for="nsiruri">Nr. șiruri paralel:</label>
+        <input type="number" id="nsiruri" value="1" min="1" />
+      </div>
+      <div class="field">
+        <label for="vmp">Vmp panou [V]:</label>
+        <input type="number" id="vmp" value="41.52" step="0.01" />
+      </div>
+      <div class="field">
+        <label for="imp">Imp panou [A]:</label>
+        <input type="number" id="imp" value="10.84" step="0.01" />
+      </div>
+      <div class="field">
+        <label for="voc">Voc panou [V]:</label>
+        <input type="number" id="voc" value="49.70" step="0.01" />
+      </div>
+      <div class="field">
+        <label for="isc">Isc panou [A]:</label>
+        <input type="number" id="isc" value="11.36" step="0.01" />
+      </div>
+    </div>
+    <button type="button" id="btn-calc" class="btn-primary">Calculează</button>
+  </div>
+
+  <div class="card" id="results" style="display:none;">
+    <h2>Rezultate — Partea DC (panouri → invertor)</h2>
+    <div class="results-grid">
+      <div class="res"><span>V max DC</span><strong id="r-vmax">—</strong></div>
+      <div class="res"><span>V min DC</span><strong id="r-vmin">—</strong></div>
+      <div class="res"><span>I max DC</span><strong id="r-imax">—</strong></div>
+      <div class="res"><span>P max DC</span><strong id="r-pmax">—</strong></div>
+    </div>
+
+    <h2>Invertor minim recomandat</h2>
+    <div class="results-grid">
+      <div class="res"><span>P max invertor</span><strong id="r-pinv">—</strong></div>
+      <div class="res"><span>V intrare max invertor</span><strong id="r-vinvmax">—</strong></div>
+      <div class="res"><span>V intrare min invertor</span><strong id="r-vinvmin">—</strong></div>
+      <div class="res"><span>I intrare max invertor</span><strong id="r-iinv">—</strong></div>
+    </div>
+
+    <h2>Cabluri și protecții</h2>
+    <div class="results-grid">
+      <div class="res"><span>U max generat/șir PV</span><strong id="r-upv">—</strong></div>
+      <div class="res"><span>Cădere tensiune admisă</span><strong id="r-cdt">—</strong></div>
+      <div class="res"><span>I nominal protecție</span><strong id="r-inom">—</strong></div>
+      <div class="res"><span>I calcul</span><strong id="r-icalc">—</strong></div>
+      <div class="res"><span>Secțiune conductor solar</span><strong id="r-scond-solar">—</strong></div>
+      <div class="res"><span>Secțiune conductor AC</span><strong id="r-scond-ac">—</strong></div>
+    </div>
+  </div>
+</SimulatorLayout>
+
+<script>
+  document.getElementById('btn-calc')!.addEventListener('click', () => {
+    const npserie = parseFloat((document.getElementById('npserie') as HTMLInputElement).value);
+    const nsiruri = parseFloat((document.getElementById('nsiruri') as HTMLInputElement).value);
+    const vmp = parseFloat((document.getElementById('vmp') as HTMLInputElement).value);
+    const voc = parseFloat((document.getElementById('voc') as HTMLInputElement).value);
+    const isc = parseFloat((document.getElementById('isc') as HTMLInputElement).value);
+    const pinst = parseFloat((document.getElementById('pinst') as HTMLInputElement).value);
+
+    const vmaxDC = (npserie * voc * 1.1215).toFixed(1);
+    const vminDC = (npserie * vmp * 0.8785).toFixed(1);
+    const imaxDC = (nsiruri * isc * 1.0225).toFixed(1);
+
+    document.getElementById('r-vmax')!.textContent = vmaxDC + ' V';
+    document.getElementById('r-vmin')!.textContent = vminDC + ' V';
+    document.getElementById('r-imax')!.textContent = imaxDC + ' A';
+    document.getElementById('r-pmax')!.textContent = pinst.toFixed(2) + ' kWp';
+    document.getElementById('r-pinv')!.textContent = pinst.toFixed(2) + ' kW';
+    document.getElementById('r-vinvmax')!.textContent = vmaxDC + ' V';
+    document.getElementById('r-vinvmin')!.textContent = vminDC + ' V';
+    document.getElementById('r-iinv')!.textContent = imaxDC + ' A';
+
+    const upv = (npserie * vmp * 0.75).toFixed(1);
+    const cdt = (0.02 * 230).toFixed(2);
+    const inom = (1.25 * 1.25 * isc).toFixed(2);
+    const icalc = (parseFloat(inom) / 0.33).toFixed(1);
+    const sCond = (2 * 1.724e-7 * parseFloat(icalc) * 1e6) / parseFloat(cdt);
+    let sCondSolar = '6';
+    if (sCond >= 6 && sCond < 10) sCondSolar = '10';
+    else if (sCond >= 10 && sCond < 16) sCondSolar = '16';
+    else if (sCond >= 16) sCondSolar = '25';
+
+    const icalcAC = (pinst * 1000 / (3 * 230)).toFixed(2);
+    const sCondMono = (2 * 1.724e-7 * 2 * parseFloat(icalcAC) * 1e6) / parseFloat(cdt);
+    let sCondAC = '4';
+    if (sCondMono >= 4 && sCondMono < 6) sCondAC = '6';
+    else if (sCondMono >= 6 && sCondMono < 10) sCondAC = '10';
+    else if (sCondMono >= 10 && sCondMono < 16) sCondAC = '16';
+    else if (sCondMono >= 16) sCondAC = '25';
+
+    document.getElementById('r-upv')!.textContent = upv + ' V';
+    document.getElementById('r-cdt')!.textContent = cdt + ' V';
+    document.getElementById('r-inom')!.textContent = inom + ' A';
+    document.getElementById('r-icalc')!.textContent = icalc + ' A';
+    document.getElementById('r-scond-solar')!.textContent = sCondSolar + ' mm²';
+    document.getElementById('r-scond-ac')!.textContent = sCondAC + ' mm²';
+    document.getElementById('results')!.style.display = 'block';
+  });
+</script>
+
+<style>
+  h1 { font-size: 1.8rem; color: var(--color-primary-dark); margin-bottom: 0.5rem; }
+  .intro { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+  .card { background: var(--color-surface); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+  .card h2 { font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 1rem; margin-top: 1rem; }
+  .card h2:first-child { margin-top: 0; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .field label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.25rem; }
+  .field input { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; }
+  .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: var(--color-primary-dark); }
+  .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+  .res { background: #f8fafc; padding: 0.75rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+  .res span { display: block; font-size: 0.75rem; color: var(--color-text-muted); }
+  .res strong { font-size: 1.1rem; color: var(--color-primary-dark); }
+</style>

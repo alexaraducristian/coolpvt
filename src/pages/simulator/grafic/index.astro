@@ -1,0 +1,139 @@
+---
+import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
+---
+
+<SimulatorLayout title="Grafic Amortizare — CoolPVT" activeStep="grafic">
+  <h1>Grafic Amortizare Investiție</h1>
+  <p class="intro">Vizualizare sold cumulat economii vs. investiție pe 20 de ani.</p>
+
+  <div class="card">
+    <h2>Parametri grafic</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label for="g-investitie">Investiție totală [RON]:</label>
+        <input type="number" id="g-investitie" value="40000" step="1000" />
+      </div>
+      <div class="field">
+        <label for="g-energie">Energie produsă/an [kWh]:</label>
+        <input type="number" id="g-energie" value="6500" step="100" />
+      </div>
+      <div class="field">
+        <label for="g-pret-kwh">Preț kWh [RON]:</label>
+        <input type="number" id="g-pret-kwh" value="1.1" step="0.1" />
+      </div>
+      <div class="field">
+        <label for="g-inflatie">Inflație anuală [%]:</label>
+        <input type="number" id="g-inflatie" value="9.6" step="0.5" />
+      </div>
+      <div class="field">
+        <label for="g-degradare">Degradare randament/an [%]:</label>
+        <input type="number" id="g-degradare" value="0.55" step="0.05" />
+      </div>
+    </div>
+    <button type="button" id="btn-grafic" class="btn-primary">Generează Grafic</button>
+  </div>
+
+  <div class="card" id="chart-container" style="display:none;">
+    <h2>Grafic Amortizare (20 ani)</h2>
+    <canvas id="chart-amortizare" width="800" height="400"></canvas>
+    <p class="legend">
+      <span class="leg-bar">■</span> Sold cumulat (economii - investiție) |
+      <span class="leg-line">—</span> Linia de amortizare (sold = 0)
+    </p>
+  </div>
+</SimulatorLayout>
+
+<script>
+  document.getElementById('btn-grafic')!.addEventListener('click', () => {
+    const investitie = parseFloat((document.getElementById('g-investitie') as HTMLInputElement).value);
+    const energieAn = parseFloat((document.getElementById('g-energie') as HTMLInputElement).value);
+    const pretKwh = parseFloat((document.getElementById('g-pret-kwh') as HTMLInputElement).value);
+    const inflatie = parseFloat((document.getElementById('g-inflatie') as HTMLInputElement).value) / 100;
+    const degradare = parseFloat((document.getElementById('g-degradare') as HTMLInputElement).value) / 100;
+
+    const values: number[] = [];
+    let cumul = 0;
+    for (let i = 1; i <= 20; i++) {
+      const e = energieAn * (1 - degradare * i);
+      const p = pretKwh * Math.pow(1 + inflatie, i);
+      cumul += e * p;
+      values.push(cumul - investitie);
+    }
+
+    const canvas = document.getElementById('chart-amortizare') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d')!;
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const maxVal = Math.max(...values.map(Math.abs));
+    const padding = { top: 30, bottom: 40, left: 70, right: 20 };
+    const chartW = w - padding.left - padding.right;
+    const chartH = h - padding.top - padding.bottom;
+    const barW = chartW / 20 - 4;
+
+    // Scale
+    const scale = chartH / (maxVal * 2.2);
+    const zeroY = padding.top + chartH * (maxVal * 1.1) / (maxVal * 2.2);
+
+    // Axes
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left, h - padding.bottom);
+    ctx.lineTo(w - padding.right, h - padding.bottom);
+    ctx.stroke();
+
+    // Zero line
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath();
+    ctx.moveTo(padding.left, zeroY);
+    ctx.lineTo(w - padding.right, zeroY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Bars
+    values.forEach((val, i) => {
+      const x = padding.left + i * (chartW / 20) + 2;
+      const barH = Math.abs(val) * scale;
+      const y = val >= 0 ? zeroY - barH : zeroY;
+      ctx.fillStyle = val >= 0 ? '#059669' : '#dc2626';
+      ctx.fillRect(x, y, barW, barH);
+
+      // Label
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${i + 1}`, x + barW / 2, h - padding.bottom + 15);
+    });
+
+    // Y-axis labels
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('0 RON', padding.left - 5, zeroY + 4);
+    ctx.fillText(`+${(maxVal * 1.1 / 1000).toFixed(0)}k`, padding.left - 5, padding.top + 10);
+    ctx.fillText(`-${(maxVal * 1.1 / 1000).toFixed(0)}k`, padding.left - 5, h - padding.bottom - 5);
+
+    document.getElementById('chart-container')!.style.display = 'block';
+  });
+</script>
+
+<style>
+  h1 { font-size: 1.8rem; color: var(--color-primary-dark); margin-bottom: 0.5rem; }
+  .intro { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+  .card { background: var(--color-surface); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+  .card h2 { font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 1rem; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .field label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.25rem; }
+  .field input { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; }
+  .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: var(--color-primary-dark); }
+  canvas { width: 100%; max-width: 800px; height: auto; display: block; margin: 0 auto; }
+  .legend { text-align: center; margin-top: 0.75rem; font-size: 0.85rem; color: var(--color-text-muted); }
+  .leg-bar { color: #059669; }
+  .leg-line { color: #dc2626; }
+</style>

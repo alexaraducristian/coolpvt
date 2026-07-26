@@ -1,0 +1,110 @@
+---
+import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
+---
+
+<SimulatorLayout title="Răcire PVT (Termic) — CoolPVT" activeStep="racire-pvt">
+  <h1>Componenta Termică (PVT)</h1>
+  <p class="intro">Calcul producție energie termică prin răcirea panourilor PV cu apă (țeavă Cu).</p>
+
+  <div class="card">
+    <h2>Parametri sistem termic</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label for="tip-acoperis">Tip acoperiș:</label>
+        <select id="tip-acoperis">
+          <option value="beton" selected>Beton</option>
+          <option value="tabla">Tablă</option>
+          <option value="lemn">Lemn</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="diametru-teava">Diametru țeavă Cu [mm]:</label>
+        <select id="diametru-teava">
+          <option value="15" selected>15 mm</option>
+          <option value="18">18 mm</option>
+          <option value="22">22 mm</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="debit-apa">Debit apă intrare [kg/s]:</label>
+        <input type="number" id="debit-apa" value="0.02" step="0.005" min="0" />
+      </div>
+      <div class="field">
+        <label for="temp-apa-intrare">Temperatura apă intrare [°C]:</label>
+        <input type="number" id="temp-apa-intrare" value="15" min="5" max="30" />
+      </div>
+      <div class="field">
+        <label for="nr-pvt">Nr. panouri PVT:</label>
+        <input type="number" id="nr-pvt" value="11" min="1" />
+      </div>
+      <div class="field">
+        <label for="randament-pvt">Randament PVT [0-1]:</label>
+        <input type="number" id="randament-pvt" value="0.7" step="0.05" min="0" max="1" />
+      </div>
+    </div>
+    <button type="button" id="btn-calc-pvt" class="btn-primary">Calculează energie termică</button>
+  </div>
+
+  <div class="card" id="results-pvt" style="display:none;">
+    <h2>Rezultate — Energie termică produsă (Mai-Septembrie)</h2>
+    <table>
+      <thead><tr><th>Luna</th><th>T apă ieșire medie [°C]</th><th>Energie termică [kJ/zi]</th><th>Energie termică [kWh/lună]</th></tr></thead>
+      <tbody id="tbl-pvt-body"></tbody>
+      <tfoot><tr class="total"><td colspan="3"><strong>TOTAL sezon cald</strong></td><td><strong id="total-termic">—</strong></td></tr></tfoot>
+    </table>
+  </div>
+</SimulatorLayout>
+
+<script>
+  const tempIesireBeton: Record<string, number[]> = {
+    mai: [21.5,24,27,29,31,34,34,32.5,30.5,27.5,25,22],
+    iun: [25,28,30,34,38,39,41,42,41,37,32,29],
+    iul: [25,29,34,38,44,47,50,52,50,46,38,33],
+    aug: [27,30,35,38,42,45,44,43,42,38,33,30],
+    sept: [23,25,29,31,35,39,39,38,35,32,28,23],
+  };
+
+  document.getElementById('btn-calc-pvt')!.addEventListener('click', () => {
+    const debit = parseFloat((document.getElementById('debit-apa') as HTMLInputElement).value);
+    const tIntrare = parseFloat((document.getElementById('temp-apa-intrare') as HTMLInputElement).value);
+    const nrPVT = parseFloat((document.getElementById('nr-pvt') as HTMLInputElement).value);
+    const randPVT = parseFloat((document.getElementById('randament-pvt') as HTMLInputElement).value);
+    const cApa = 4.186; // kJ/(kg·K)
+    const luni = ['mai','iun','iul','aug','sept'];
+    const numelLuni = ['Mai','Iunie','Iulie','August','Septembrie'];
+    let totalKwh = 0;
+    let html = '';
+
+    luni.forEach((luna, idx) => {
+      const temps = tempIesireBeton[luna];
+      let eZiKJ = 0;
+      let tMedie = 0;
+      temps.forEach(t => { eZiKJ += debit * cApa * (t - tIntrare); tMedie += t; });
+      tMedie /= temps.length;
+      const eZiKJTotal = eZiKJ * nrPVT * randPVT;
+      const eLunaKWh = (eZiKJTotal / 3600) * 30;
+      totalKwh += eLunaKWh;
+      html += `<tr><td>${numelLuni[idx]}</td><td>${tMedie.toFixed(1)}°C</td><td>${eZiKJTotal.toFixed(0)}</td><td>${eLunaKWh.toFixed(1)}</td></tr>`;
+    });
+
+    document.getElementById('tbl-pvt-body')!.innerHTML = html;
+    document.getElementById('total-termic')!.textContent = totalKwh.toFixed(1) + ' kWh';
+    document.getElementById('results-pvt')!.style.display = 'block';
+  });
+</script>
+
+<style>
+  h1 { font-size: 1.8rem; color: var(--color-primary-dark); margin-bottom: 0.5rem; }
+  .intro { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+  .card { background: var(--color-surface); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+  .card h2 { font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 1rem; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .field label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.25rem; }
+  .field input, .field select { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; }
+  .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: var(--color-primary-dark); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.5rem; }
+  th { background: var(--color-primary-dark); color: white; padding: 0.5rem; text-align: left; }
+  td { padding: 0.5rem; border-bottom: 1px solid #f1f5f9; }
+  .total td { background: #ecfdf5; border-top: 2px solid #6ee7b7; }
+</style>

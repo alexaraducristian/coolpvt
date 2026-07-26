@@ -1,0 +1,140 @@
+---
+import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
+
+const consumatori = [
+  { id: 'incandescent', name: 'Iluminat incandescent', putere: 60, ore: 6, buc: 1 },
+  { id: 'fluorescent', name: 'Iluminat fluorescent', putere: 13, ore: 6, buc: 1 },
+  { id: 'led', name: 'Iluminat LED', putere: 10, ore: 6, buc: 5 },
+  { id: 'centrala', name: 'Centrală termică', putere: 150, ore: 10, buc: 1 },
+  { id: 'boiler', name: 'Boiler electric', putere: 1500, ore: 2, buc: 1 },
+  { id: 'cuptor', name: 'Cuptor electric', putere: 1500, ore: 1, buc: 1 },
+  { id: 'plita', name: 'Plită electrică', putere: 1800, ore: 2, buc: 1 },
+  { id: 'frigider', name: 'Frigider', putere: 353, ore: 4, buc: 1 },
+  { id: 'microunde', name: 'Cuptor microunde', putere: 1500, ore: 1, buc: 1 },
+  { id: 'masina-spalat', name: 'Mașină de spălat', putere: 250, ore: 1, buc: 1 },
+  { id: 'masina-vase', name: 'Mașină spălat vase', putere: 700, ore: 1, buc: 1 },
+  { id: 'televizor', name: 'Televizor', putere: 150, ore: 4, buc: 1 },
+  { id: 'mixer', name: 'Mixer / Robot bucătărie', putere: 400, ore: 1, buc: 1 },
+  { id: 'uscator', name: 'Uscător rufe', putere: 1000, ore: 1, buc: 1 },
+  { id: 'cafea', name: 'Filtru cafea / Espressor', putere: 1000, ore: 1, buc: 1 },
+];
+---
+
+<SimulatorLayout title="Consumatori — CoolPVT" activeStep="consumatori">
+  <h1>Calculator Consumatori Electrici</h1>
+  <p class="intro">Bifați receptoarele electrice din locuință și ajustați valorile. Se calculează automat consumul zilnic și lunar.</p>
+
+  <div class="table-container">
+    <table id="tbl-consumatori">
+      <thead>
+        <tr>
+          <th>Activ</th>
+          <th>Receptor electric</th>
+          <th>Nr. buc</th>
+          <th>Putere [W]</th>
+          <th>Ore/zi</th>
+          <th>E zilnic [kWh]</th>
+          <th>E lunar [kWh]</th>
+        </tr>
+      </thead>
+      <tbody>
+        {consumatori.map(c => (
+          <tr data-id={c.id}>
+            <td><input type="checkbox" class="chk-activ" /></td>
+            <td>{c.name}</td>
+            <td><input type="number" class="inp-buc" value={c.buc} min="0" max="50" /></td>
+            <td><input type="number" class="inp-putere" value={c.putere} min="0" step="10" /></td>
+            <td><input type="number" class="inp-ore" value={c.ore} min="0" max="24" /></td>
+            <td class="val-zilnic">—</td>
+            <td class="val-lunar">—</td>
+          </tr>
+        ))}
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="5"><strong>TOTAL</strong></td>
+          <td><strong id="total-zilnic">0</strong></td>
+          <td><strong id="total-lunar">0</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="extra-receptoare">
+    <h3>Receptoare suplimentare (personalizate)</h3>
+    <div id="extra-container"></div>
+    <button type="button" id="btn-add-receptor" class="btn-secondary">+ Adaugă receptor</button>
+  </div>
+
+  <div class="actions">
+    <button type="button" id="btn-confirma" class="btn-primary">Confirmă și revino la Dimensionare</button>
+  </div>
+</SimulatorLayout>
+
+<script>
+  function recalculate() {
+    let totalZ = 0, totalL = 0;
+    document.querySelectorAll('#tbl-consumatori tbody tr').forEach(row => {
+      const chk = row.querySelector('.chk-activ') as HTMLInputElement;
+      const buc = parseFloat((row.querySelector('.inp-buc') as HTMLInputElement).value) || 0;
+      const putere = parseFloat((row.querySelector('.inp-putere') as HTMLInputElement).value) || 0;
+      const ore = parseFloat((row.querySelector('.inp-ore') as HTMLInputElement).value) || 0;
+      if (chk.checked) {
+        const ez = (buc * putere * ore) / 1000;
+        const el = ez * 30;
+        row.querySelector('.val-zilnic')!.textContent = ez.toFixed(2);
+        row.querySelector('.val-lunar')!.textContent = el.toFixed(1);
+        totalZ += ez; totalL += el;
+      } else {
+        row.querySelector('.val-zilnic')!.textContent = '—';
+        row.querySelector('.val-lunar')!.textContent = '—';
+      }
+    });
+    document.getElementById('total-zilnic')!.textContent = totalZ.toFixed(2) + ' kWh';
+    document.getElementById('total-lunar')!.textContent = totalL.toFixed(1) + ' kWh';
+  }
+
+  document.querySelectorAll('#tbl-consumatori input').forEach(inp => {
+    inp.addEventListener('change', recalculate);
+    inp.addEventListener('input', recalculate);
+  });
+
+  document.getElementById('btn-confirma')!.addEventListener('click', () => {
+    recalculate();
+    const total = document.getElementById('total-lunar')!.textContent;
+    alert(`Consum lunar total: ${total}. Reveniți la pagina Dimensionare și introduceți această valoare.`);
+  });
+
+  let extraCount = 0;
+  document.getElementById('btn-add-receptor')!.addEventListener('click', () => {
+    extraCount++;
+    const div = document.createElement('div');
+    div.className = 'extra-row';
+    div.innerHTML = `<input type="text" placeholder="Nume receptor" /><input type="number" placeholder="W" value="100" min="0" /><input type="number" placeholder="Ore" value="1" min="0" max="24" /><input type="number" placeholder="Buc" value="1" min="0" />`;
+    document.getElementById('extra-container')!.appendChild(div);
+  });
+</script>
+
+<style>
+  h1 { font-size: 1.8rem; color: var(--color-primary-dark); margin-bottom: 0.5rem; }
+  .intro { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+  .table-container { overflow-x: auto; background: var(--color-surface); border-radius: 12px; border: 1px solid #e2e8f0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th { background: var(--color-primary-dark); color: white; padding: 0.6rem 0.5rem; text-align: left; font-size: 0.8rem; }
+  td { padding: 0.5rem; border-bottom: 1px solid #f1f5f9; }
+  tbody tr:hover { background: #f8fafc; }
+  .inp-buc, .inp-ore { width: 60px; }
+  .inp-putere { width: 80px; }
+  input[type="number"] { padding: 0.3rem 0.4rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; }
+  .total-row td { background: #ecfdf5; border-top: 2px solid #6ee7b7; }
+  .extra-receptoare { margin-top: 1.5rem; background: var(--color-surface); border-radius: 12px; padding: 1.5rem; border: 1px solid #e2e8f0; }
+  .extra-receptoare h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+  .extra-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .extra-row input { padding: 0.3rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; }
+  .extra-row input[type="text"] { flex: 2; }
+  .extra-row input[type="number"] { width: 70px; }
+  .actions { margin-top: 1.5rem; text-align: center; }
+  .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: var(--color-primary-dark); }
+  .btn-secondary { background: #f1f5f9; color: var(--color-primary); border: 1px solid #cbd5e1; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+</style>

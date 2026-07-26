@@ -1,0 +1,153 @@
+---
+import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
+---
+
+<SimulatorLayout title="Analiză Economică — CoolPVT" activeStep="economic">
+  <h1>Analiză Economică</h1>
+  <p class="intro">Calcul investiție, amortizare și economii pe 20 de ani.</p>
+
+  <div class="card">
+    <h2>Costuri investiție</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label for="pret-pv">Preț panou fotovoltaic [RON]:</label>
+        <input type="number" id="pret-pv" value="1350" step="50" />
+      </div>
+      <div class="field">
+        <label for="nr-panouri">Nr. panouri:</label>
+        <input type="number" id="nr-panouri" value="11" min="1" />
+      </div>
+      <div class="field">
+        <label for="pret-invertor">Preț invertor [RON]:</label>
+        <input type="number" id="pret-invertor" value="5000" step="100" />
+      </div>
+      <div class="field">
+        <label for="pret-contor">Preț contor inteligent [RON]:</label>
+        <input type="number" id="pret-contor" value="1500" step="100" />
+      </div>
+      <div class="field">
+        <label for="pret-montaj">Preț sistem montaj [RON]:</label>
+        <input type="number" id="pret-montaj" value="3000" step="100" />
+      </div>
+      <div class="field">
+        <label for="pret-manopera">Manoperă [RON]:</label>
+        <input type="number" id="pret-manopera" value="2000" step="100" />
+      </div>
+      <div class="field">
+        <label for="pret-transport">Transport [RON]:</label>
+        <input type="number" id="pret-transport" value="500" step="50" />
+      </div>
+      <div class="field">
+        <label for="pret-materiale">Materiale electrice [RON]:</label>
+        <input type="number" id="pret-materiale" value="1500" step="100" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Parametri economici</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label for="pret-kwh">Preț kWh [RON]:</label>
+        <input type="number" id="pret-kwh" value="1.1" step="0.1" />
+      </div>
+      <div class="field">
+        <label for="inflatie">Inflație anuală [%]:</label>
+        <input type="number" id="inflatie" value="9.6" step="0.5" />
+      </div>
+      <div class="field">
+        <label for="energie-an">Energie produsă/an [kWh]:</label>
+        <input type="number" id="energie-an" value="6500" step="100" />
+      </div>
+      <div class="field">
+        <label for="degradare">Degradare randament/an [%]:</label>
+        <input type="number" id="degradare" value="0.55" step="0.05" />
+      </div>
+    </div>
+    <button type="button" id="btn-economic" class="btn-primary">Calculează amortizare</button>
+  </div>
+
+  <div class="card" id="results-eco" style="display:none;">
+    <h2>Rezultate</h2>
+    <div class="summary">
+      <div class="res"><span>Investiție totală (cu TVA)</span><strong id="r-investitie">—</strong></div>
+      <div class="res"><span>Economie anul 1</span><strong id="r-eco-an1">—</strong></div>
+      <div class="res"><span>Perioadă amortizare</span><strong id="r-amortizare">—</strong></div>
+      <div class="res"><span>Economie totală 20 ani</span><strong id="r-eco-total">—</strong></div>
+    </div>
+
+    <h3>Detaliere pe ani</h3>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>An</th><th>Energie [kWh]</th><th>Economie/an [RON]</th><th>Cumul economii [RON]</th><th>Sold [RON]</th></tr></thead>
+        <tbody id="tbl-eco-body"></tbody>
+      </table>
+    </div>
+    <p class="note">→ Continuați la <a href="/coolpvt/simulator/grafic/">Grafic Amortizare</a> pentru vizualizare.</p>
+  </div>
+</SimulatorLayout>
+
+<script>
+  document.getElementById('btn-economic')!.addEventListener('click', () => {
+    const nrPanouri = parseFloat((document.getElementById('nr-panouri') as HTMLInputElement).value);
+    const pretPV = parseFloat((document.getElementById('pret-pv') as HTMLInputElement).value);
+    const pretInvertor = parseFloat((document.getElementById('pret-invertor') as HTMLInputElement).value);
+    const pretContor = parseFloat((document.getElementById('pret-contor') as HTMLInputElement).value);
+    const pretMontaj = parseFloat((document.getElementById('pret-montaj') as HTMLInputElement).value);
+    const pretManopera = parseFloat((document.getElementById('pret-manopera') as HTMLInputElement).value);
+    const pretTransport = parseFloat((document.getElementById('pret-transport') as HTMLInputElement).value);
+    const pretMateriale = parseFloat((document.getElementById('pret-materiale') as HTMLInputElement).value);
+    const pretKwh = parseFloat((document.getElementById('pret-kwh') as HTMLInputElement).value);
+    const inflatie = parseFloat((document.getElementById('inflatie') as HTMLInputElement).value) / 100;
+    const energieAn = parseFloat((document.getElementById('energie-an') as HTMLInputElement).value);
+    const degradare = parseFloat((document.getElementById('degradare') as HTMLInputElement).value) / 100;
+
+    const investitie = (nrPanouri * pretPV + pretInvertor + pretContor + pretMontaj + pretManopera + pretTransport + pretMateriale) * 1.19;
+    let cumulEconomii = 0;
+    let anAmortizare = 20;
+    let html = '';
+
+    for (let i = 1; i <= 20; i++) {
+      const energieAni = energieAn * (1 - degradare * i);
+      const pretKwhAn = pretKwh * Math.pow(1 + inflatie, i);
+      const economieAn = energieAni * pretKwhAn;
+      cumulEconomii += economieAn;
+      const sold = cumulEconomii - investitie;
+      if (sold >= 0 && anAmortizare === 20 && i < 20) anAmortizare = i;
+      html += `<tr class="${sold >= 0 ? 'positive' : ''}"><td>${i}</td><td>${energieAni.toFixed(0)}</td><td>${economieAn.toFixed(0)}</td><td>${cumulEconomii.toFixed(0)}</td><td>${sold.toFixed(0)}</td></tr>`;
+    }
+
+    document.getElementById('r-investitie')!.textContent = investitie.toFixed(0) + ' RON';
+    document.getElementById('r-eco-an1')!.textContent = (energieAn * (1 - degradare) * pretKwh * (1 + inflatie)).toFixed(0) + ' RON';
+    document.getElementById('r-amortizare')!.textContent = anAmortizare + ' ani';
+    document.getElementById('r-eco-total')!.textContent = cumulEconomii.toFixed(0) + ' RON';
+    document.getElementById('tbl-eco-body')!.innerHTML = html;
+    document.getElementById('results-eco')!.style.display = 'block';
+  });
+</script>
+
+<style>
+  h1 { font-size: 1.8rem; color: var(--color-primary-dark); margin-bottom: 0.5rem; }
+  .intro { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+  .card { background: var(--color-surface); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+  .card h2, .card h3 { font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 1rem; }
+  .card h3 { margin-top: 1.5rem; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; margin-bottom: 1rem; }
+  .field label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.25rem; }
+  .field input { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; }
+  .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: var(--color-primary-dark); }
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+  .res { background: #f8fafc; padding: 0.75rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+  .res span { display: block; font-size: 0.75rem; color: var(--color-text-muted); }
+  .res strong { font-size: 1.1rem; color: var(--color-primary-dark); }
+  .table-container { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: var(--color-primary-dark); color: white; padding: 0.4rem 0.5rem; text-align: right; }
+  th:first-child { text-align: center; }
+  td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #f1f5f9; text-align: right; }
+  td:first-child { text-align: center; }
+  .positive { background: #ecfdf5; }
+  .note { margin-top: 1rem; font-size: 0.9rem; color: var(--color-text-muted); }
+  .note a { color: var(--color-primary); }
+</style>
