@@ -57,9 +57,36 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
   <div class="card info-box">
     <h2>Efect asupra producției</h2>
     <p>Răcirea panourilor PV reduce temperatura celulelor cu 5-20°C în lunile calde (Mai-Septembrie), crescând randamentul electric cu 2-16% în funcție de metoda aleasă.</p>
-    <p>Coeficienții de corecție sunt aplicați automat lunilor calde în calculul energiei produse anual.</p>
+    <p>Coeficienții de corecție sunt aplicați automat lunilor calde în calculul energiei produse anual din pagina Dimensionare.</p>
+    <p class="selected-info">Metoda selectată: <strong id="metoda-text">Disipator căldură orizontal</strong></p>
   </div>
 </SimulatorLayout>
+
+<script>
+  const metode: Record<string, string> = {
+    '1': 'Disipator căldură orizontal',
+    '2': 'Disipator căldură orizontal perforat',
+    '3': 'Disipator căldură vertical',
+    '4': 'Disipator căldură vertical perforat',
+    '5': 'Schimbător căldură pelicular (apă)',
+    '6': 'Schimbător căldură țeavă Cu (PVT)',
+  };
+
+  // Restore selection from localStorage
+  const saved = localStorage.getItem('coolpvt-racire-metoda') || '1';
+  const savedRadio = document.querySelector(`input[name="racire"][value="${saved}"]`) as HTMLInputElement;
+  if (savedRadio) savedRadio.checked = true;
+  document.getElementById('metoda-text')!.textContent = metode[saved] || metode['1'];
+
+  // Save on change
+  document.querySelectorAll('input[name="racire"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const val = (radio as HTMLInputElement).value;
+      localStorage.setItem('coolpvt-racire-metoda', val);
+      document.getElementById('metoda-text')!.textContent = metode[val];
+    });
+  });
+</script>
 
 <style>
   h1 { font-size: 1.8rem; color: var(--color-primary-dark); margin-bottom: 0.5rem; }

@@ -44,6 +44,28 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
 </SimulatorLayout>
 
 <script>
+  // Preluare parametri din URL (venind de la pagina Economic)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('investitie')) {
+    (document.getElementById('g-investitie') as HTMLInputElement).value = urlParams.get('investitie')!;
+  }
+  if (urlParams.get('energie')) {
+    (document.getElementById('g-energie') as HTMLInputElement).value = urlParams.get('energie')!;
+  }
+  if (urlParams.get('pret')) {
+    (document.getElementById('g-pret-kwh') as HTMLInputElement).value = urlParams.get('pret')!;
+  }
+  if (urlParams.get('inflatie')) {
+    (document.getElementById('g-inflatie') as HTMLInputElement).value = urlParams.get('inflatie')!;
+  }
+  if (urlParams.get('degradare')) {
+    (document.getElementById('g-degradare') as HTMLInputElement).value = urlParams.get('degradare')!;
+  }
+  // Auto-generate grafic daca avem parametri din URL
+  if (urlParams.get('investitie')) {
+    setTimeout(() => document.getElementById('btn-grafic')!.click(), 100);
+  }
+
   document.getElementById('btn-grafic')!.addEventListener('click', () => {
     const investitie = parseFloat((document.getElementById('g-investitie') as HTMLInputElement).value);
     const energieAn = parseFloat((document.getElementById('g-energie') as HTMLInputElement).value);

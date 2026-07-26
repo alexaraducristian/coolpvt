@@ -101,8 +101,10 @@ const consumatori = [
 
   document.getElementById('btn-confirma')!.addEventListener('click', () => {
     recalculate();
-    const total = document.getElementById('total-lunar')!.textContent;
-    alert(`Consum lunar total: ${total}. Reveniți la pagina Dimensionare și introduceți această valoare.`);
+    const totalText = document.getElementById('total-lunar')!.textContent || '0';
+    const totalValue = parseFloat(totalText.replace(' kWh', '')) || 0;
+    // Redirect la pagina de dimensionare cu consumul lunar ca query param
+    window.location.href = '/coolpvt/simulator/?consum=' + totalValue.toFixed(1);
   });
 
   let extraCount = 0;

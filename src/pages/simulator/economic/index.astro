@@ -83,7 +83,7 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
         <tbody id="tbl-eco-body"></tbody>
       </table>
     </div>
-    <p class="note">→ Continuați la <a href="/coolpvt/simulator/grafic/">Grafic Amortizare</a> pentru vizualizare.</p>
+    <p class="note">→ <a href="#" id="link-grafic">Continuați la Grafic Amortizare pentru vizualizare</a></p>
   </div>
 </SimulatorLayout>
 
@@ -123,6 +123,10 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
     document.getElementById('r-eco-total')!.textContent = cumulEconomii.toFixed(0) + ' RON';
     document.getElementById('tbl-eco-body')!.innerHTML = html;
     document.getElementById('results-eco')!.style.display = 'block';
+
+    // Update link grafic cu parametri
+    const linkGrafic = document.getElementById('link-grafic') as HTMLAnchorElement;
+    linkGrafic.href = `/coolpvt/simulator/grafic/?investitie=${investitie.toFixed(0)}&energie=${energieAn}&pret=${pretKwh}&inflatie=${(inflatie*100).toFixed(1)}&degradare=${(degradare*100).toFixed(2)}`;
   });
 </script>
 

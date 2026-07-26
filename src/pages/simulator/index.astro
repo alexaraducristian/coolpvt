@@ -298,6 +298,20 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
     return oriData[closest];
   }
 
+  // Preluare consum din URL (redirect de la pagina Consumatori)
+  const urlParams = new URLSearchParams(window.location.search);
+  const consumFromUrl = urlParams.get('consum');
+  if (consumFromUrl) {
+    const consumInput = document.getElementById('consum-lunar') as HTMLInputElement;
+    consumInput.value = consumFromUrl;
+    // Selecteaza automat modalitatea "consum lunar"
+    const radioConsum = document.querySelector('input[name="modalitate"][value="consum"]') as HTMLInputElement;
+    radioConsum.checked = true;
+    document.getElementById('input-consum')!.style.display = '';
+    document.getElementById('input-putere')!.style.display = 'none';
+    document.getElementById('input-receptoare')!.style.display = 'none';
+  }
+
   // Toggle modalitate consum
   document.querySelectorAll('input[name="modalitate"]').forEach(r => {
     r.addEventListener('change', () => {
@@ -363,9 +377,18 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
     const coefCorectie = randPV / randStandard;
 
     // Coeficienti de racire PV per luna (apr-sept au bonus, restul = 1)
-    // Metoda 1 (disipator orizontal) ca default
+    // Citeste metoda de racire din localStorage
+    const metodaRacire = localStorage.getItem('coolpvt-racire-metoda') || '1';
+    const coeficienteRacire: Record<string, number[]> = {
+      '1': [1,1,1, 1.0296, 1.0411, 1.0411, 1.0535, 1.0535, 1.0296, 1,1,1], // Disipator orizontal
+      '2': [1,1,1, 1.0316, 1.0440, 1.0440, 1.0572, 1.0572, 1.0316, 1,1,1], // Disipator orizontal perforat
+      '3': [1,1,1, 1.0259, 1.0342, 1.0342, 1.0447, 1.0447, 1.0259, 1,1,1], // Disipator vertical
+      '4': [1,1,1, 1.0267, 1.0371, 1.0371, 1.0486, 1.0486, 1.0267, 1,1,1], // Disipator vertical perforat
+      '5': [1,1,1, 1.0684, 1.1111, 1.1111, 1.1597, 1.1597, 1.0684, 1,1,1], // Schimbator pelicular
+      '6': [1,1,1, 1.0684, 1.1111, 1.1111, 1.1597, 1.1597, 1.0684, 1,1,1], // Teava Cu (PVT)
+    };
     const coefRacire = racireActiva
-      ? [1, 1, 1, 1.0296, 1.0411, 1.0411, 1.0535, 1.0535, 1.0296, 1, 1, 1]
+      ? (coeficienteRacire[metodaRacire] || coeficienteRacire['1'])
       : [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
     // Energie produsa pe mp pe luna de dimensionare
