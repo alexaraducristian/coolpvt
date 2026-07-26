@@ -2,42 +2,60 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="CoolPVT — Simulator fotovoltaic termic">
+<Layout title="CoolPVT — Simulator fotovoltaic termic" activeNav="home">
   <section class="hero">
-    <h1>CoolPVT</h1>
-    <p class="subtitle">Simulator de dimensionare sistem fotovoltaic termic</p>
+    <div class="hero-badge">Versiune Web 6.0</div>
+    <h1>Cool<span class="accent">PVT</span></h1>
+    <p class="subtitle">Simulator profesional de dimensionare sisteme fotovoltaice termice</p>
     <p class="description">
-      Aplicație de dimensionare a sistemelor fotovoltaice termice (PVT) pentru România.
-      Calculează producția de energie electrică și termică, dimensionarea electrică,
-      analiza economică și amortizarea investiției.
+      Proiectează și dimensionează sisteme fotovoltaice termice (PVT) pentru România.
+      Calcule precise bazate pe date reale de radiație solară, cu analiză economică pe 20 de ani.
     </p>
-    <a href="/coolpvt/simulator/" class="cta-button">Deschide Simulatorul</a>
+    <div class="hero-actions">
+      <a href="/coolpvt/simulator/" class="cta-button">Deschide Simulatorul</a>
+      <a href="/coolpvt/despre/" class="cta-link">Află mai multe →</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><strong>7</strong><span>Regiuni România</span></div>
+      <div class="stat"><strong>20+</strong><span>Panouri PV</span></div>
+      <div class="stat"><strong>6</strong><span>Metode răcire</span></div>
+      <div class="stat"><strong>20 ani</strong><span>Analiză economică</span></div>
+    </div>
   </section>
 
   <section class="features">
-    <div class="feature-card">
-      <h3>☀️ Radiație solară</h3>
-      <p>Bază de date completă cu radiația solară pentru 7 regiuni din România, pe orientări și unghiuri de înclinare.</p>
-    </div>
-    <div class="feature-card">
-      <h3>⚡ Dimensionare electrică</h3>
-      <p>Calcul automat al numărului de panouri, invertor, secțiuni cabluri și protecții electrice.</p>
-    </div>
-    <div class="feature-card">
-      <h3>🌡️ Componenta termică</h3>
-      <p>Simulare răcire panouri PV cu apă — calcul temperaturi și energie termică produsă.</p>
-    </div>
-    <div class="feature-card">
-      <h3>💰 Analiză economică</h3>
-      <p>Estimare amortizare investiție pe 20 de ani, cu factori de inflație și degradare randament.</p>
-    </div>
-    <div class="feature-card">
-      <h3>🏠 Calculator consum</h3>
-      <p>Introducere detaliată a consumatorilor electrici din locuință pentru dimensionare precisă.</p>
-    </div>
-    <div class="feature-card">
-      <h3>📄 Raport PDF</h3>
-      <p>Generare raport complet de dimensionare, exportabil în format PDF.</p>
+    <h2 class="section-title">Funcționalități</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">☀️</div>
+        <h3>Radiație solară</h3>
+        <p>Bază de date cu radiația solară pentru 7 regiuni, pe orientări și unghiuri de la 5° la 90°.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Dimensionare electrică</h3>
+        <p>Calcul invertor, tensiuni DC, secțiuni cabluri și protecții electrice conform normativelor.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌡️</div>
+        <h3>Componenta termică</h3>
+        <p>Simulare răcire PV cu apă — temperaturi, debite și energie termică produsă lunar.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3>Analiză economică</h3>
+        <p>Investiție, amortizare, inflație și economii detaliate pe 20 de ani cu grafic.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔌</div>
+        <h3>Calculator consum</h3>
+        <p>Introducere detaliată a consumatorilor electrici cu calcul automat al consumului lunar.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <h3>Raport complet</h3>
+        <p>Rezultate sintetice cu toate datele necesare pentru implementarea sistemului PVT.</p>
+      </div>
     </div>
   </section>
 </Layout>
@@ -45,74 +63,140 @@ import Layout from '../layouts/Layout.astro';
 <style>
   .hero {
     text-align: center;
-    padding: 3rem 0;
+    padding: 3rem 0 2rem;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: var(--color-accent);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    letter-spacing: 0.03em;
   }
 
   .hero h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
     color: var(--color-primary-dark);
-    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+    font-weight: 700;
   }
 
+  .accent { color: var(--color-accent); }
+
   .subtitle {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     color: var(--color-primary);
     font-weight: 500;
-    margin-bottom: 1rem;
+    margin: 0.5rem 0 1rem;
   }
 
   .description {
-    max-width: 700px;
-    margin: 0 auto 2rem;
+    max-width: 620px;
+    margin: 0 auto 1.5rem;
     color: var(--color-text-muted);
-    font-size: 1.1rem;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
   }
 
   .cta-button {
     display: inline-block;
-    background: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
     color: white;
     padding: 0.875rem 2rem;
-    border-radius: 8px;
+    border-radius: var(--radius);
     text-decoration: none;
     font-weight: 600;
-    font-size: 1.1rem;
-    transition: background 0.2s, transform 0.2s;
+    font-size: 1rem;
+    box-shadow: 0 4px 14px rgba(15,76,129,0.35);
+    transition: all 0.2s;
   }
 
   .cta-button:hover {
-    background: var(--color-primary-dark);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(15,76,129,0.45);
   }
 
-  .features {
+  .cta-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .cta-link:hover { text-decoration: underline; }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .stat { text-align: center; }
+  .stat strong { display: block; font-size: 1.5rem; color: var(--color-primary-dark); }
+  .stat span { font-size: 0.78rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .section-title {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--color-primary-dark);
+    margin: 2.5rem 0 1.5rem;
+    font-weight: 700;
+  }
+
+  .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    padding: 2rem 0;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
   }
 
   .feature-card {
     background: var(--color-surface);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e2e8f0;
-    transition: box-shadow 0.2s;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
   }
 
   .feature-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
   }
 
+  .feature-icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+
   .feature-card h3 {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
     color: var(--color-primary-dark);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
   }
 
   .feature-card p {
     color: var(--color-text-muted);
-    font-size: 0.95rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 2.5rem; }
+    .hero-stats { gap: 1rem; flex-wrap: wrap; }
+    .hero-actions { flex-direction: column; gap: 0.75rem; }
   }
 </style>

@@ -15,12 +15,18 @@ const base = '/coolpvt';
     <meta name="description" content="CoolPVT - Simulator dimensionare sistem fotovoltaic termic" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/x-icon" href={`${base}/favicon.ico`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>{title}</title>
   </head>
   <body>
     <header>
       <nav>
-        <a href={`${base}/`} class="logo">⚡ CoolPVT</a>
+        <a href={`${base}/`} class="logo">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">Cool<span class="logo-accent">PVT</span></span>
+        </a>
         <div class="nav-links">
           <a href={`${base}/`} class={activeNav === 'home' ? 'active' : ''}>Acasă</a>
           <a href={`${base}/simulator/`} class={activeNav === 'simulator' ? 'active' : ''}>Simulator</a>
@@ -32,41 +38,152 @@ const base = '/coolpvt';
       <slot />
     </main>
     <footer>
-      <p>&copy; {new Date().getFullYear()} CoolPVT — Simulator dimensionare sistem fotovoltaic termic</p>
-      <p>Dezvoltat de Marius Alexa & Valeriu-Sebastian Hudisteanu</p>
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="footer-logo">⚡ CoolPVT</span>
+          <p>Simulator profesional de dimensionare sisteme fotovoltaice termice</p>
+        </div>
+        <div class="footer-meta">
+          <p>&copy; {new Date().getFullYear()} CoolPVT v6.0</p>
+          <p>Dezvoltat de Marius Alexa & Valeriu-Sebastian Hudisteanu</p>
+        </div>
+      </div>
     </footer>
   </body>
 </html>
 
 <style is:global>
   :root {
-    --color-primary: #1a56db;
-    --color-primary-dark: #1e3a5f;
-    --color-accent: #f59e0b;
-    --color-bg: #f8fafc;
+    --color-primary: #0f4c81;
+    --color-primary-light: #1a6bb5;
+    --color-primary-dark: #0a2f4e;
+    --color-accent: #e88c30;
+    --color-accent-light: #f5a623;
+    --color-bg: #f4f6f9;
     --color-surface: #ffffff;
-    --color-text: #1e293b;
-    --color-text-muted: #64748b;
-    --color-success: #059669;
-    --color-danger: #dc2626;
-    --color-info: #2563eb;
-    --max-width: 1200px;
+    --color-surface-alt: #f8fafb;
+    --color-text: #1a2332;
+    --color-text-muted: #5a6b7b;
+    --color-border: #dce3eb;
+    --color-success: #0d7a3e;
+    --color-success-bg: #e8f5ee;
+    --color-danger: #c62828;
+    --color-info: #1565c0;
+    --shadow-sm: 0 1px 2px rgba(10,47,78,0.05);
+    --shadow-md: 0 4px 12px rgba(10,47,78,0.08);
+    --shadow-lg: 0 8px 30px rgba(10,47,78,0.12);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --max-width: 1240px;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
   }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   html {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font);
     background: var(--color-bg);
     color: var(--color-text);
     line-height: 1.6;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
   }
+
   body { min-height: 100vh; display: flex; flex-direction: column; }
-  main { flex: 1; max-width: var(--max-width); margin: 0 auto; padding: 2rem 1rem; width: 100%; }
-  header { background: var(--color-primary-dark); color: white; padding: 0 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-  nav { max-width: var(--max-width); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; }
-  nav .logo { font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; }
-  .nav-links { display: flex; gap: 1.5rem; }
-  .nav-links a { color: rgba(255,255,255,0.9); text-decoration: none; font-weight: 500; transition: color 0.2s; }
-  .nav-links a:hover, .nav-links a.active { color: var(--color-accent); }
-  footer { background: var(--color-primary-dark); color: rgba(255,255,255,0.8); text-align: center; padding: 1.5rem 1rem; font-size: 0.875rem; }
-  footer p + p { margin-top: 0.25rem; }
+
+  main {
+    flex: 1;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    width: 100%;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    color: white;
+    padding: 0 1.5rem;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  nav {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 0;
+  }
+
+  nav .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 4px rgba(232,140,48,0.5));
+  }
+
+  .logo-text {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.02em;
+  }
+
+  .logo-accent {
+    color: var(--color-accent-light);
+  }
+
+  .nav-links { display: flex; gap: 0.25rem; }
+
+  .nav-links a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .nav-links a:hover { background: rgba(255,255,255,0.1); color: white; }
+  .nav-links a.active { background: rgba(255,255,255,0.15); color: var(--color-accent-light); }
+
+  /* Footer */
+  footer {
+    background: var(--color-primary-dark);
+    color: rgba(255,255,255,0.7);
+    padding: 2rem 1.5rem;
+    margin-top: 2rem;
+    border-top: 3px solid var(--color-accent);
+  }
+
+  .footer-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand { display: flex; flex-direction: column; gap: 0.25rem; }
+  .footer-logo { font-weight: 700; font-size: 1.1rem; color: white; }
+  .footer-brand p { font-size: 0.8rem; opacity: 0.7; }
+  .footer-meta { text-align: right; font-size: 0.8rem; }
+  .footer-meta p + p { margin-top: 0.15rem; }
+
+  @media (max-width: 600px) {
+    .footer-inner { flex-direction: column; text-align: center; }
+    .footer-meta { text-align: center; }
+  }
 </style>

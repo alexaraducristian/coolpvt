@@ -103,8 +103,28 @@ const consumatori = [
     recalculate();
     const totalText = document.getElementById('total-lunar')!.textContent || '0';
     const totalValue = parseFloat(totalText.replace(' kWh', '')) || 0;
-    // Redirect la pagina de dimensionare cu consumul lunar ca query param
-    window.location.href = '/coolpvt/simulator/?consum=' + totalValue.toFixed(1);
+    // Popup confirmare
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `<div class="modal-box">
+      <h3>Confirmare consum calculat</h3>
+      <p>Consumul lunar total calculat este <strong>${totalValue.toFixed(1)} kWh/lună</strong>.</p>
+      <p>Doriți să folosiți această valoare pentru dimensionarea sistemului fotovoltaic?</p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-yes" id="modal-yes">Da, folosește</button>
+        <button class="modal-btn modal-btn-no" id="modal-no">Nu, rămân aici</button>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+    document.getElementById('modal-yes')!.addEventListener('click', () => {
+      window.location.href = '/coolpvt/simulator/?consum=' + totalValue.toFixed(1);
+    });
+    document.getElementById('modal-no')!.addEventListener('click', () => {
+      modal.remove();
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
   });
 
   let extraCount = 0;
@@ -139,4 +159,15 @@ const consumatori = [
   .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
   .btn-primary:hover { background: var(--color-primary-dark); }
   .btn-secondary { background: #f1f5f9; color: var(--color-primary); border: 1px solid #cbd5e1; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
+  .modal-box { background: white; border-radius: 12px; padding: 2rem; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal-box h3 { font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 0.75rem; }
+  .modal-box p { color: var(--color-text); margin-bottom: 0.5rem; font-size: 0.95rem; }
+  .modal-box strong { color: var(--color-primary); }
+  .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+  .modal-btn { padding: 0.6rem 1.25rem; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; border: none; }
+  .modal-btn-yes { background: var(--color-primary); color: white; }
+  .modal-btn-yes:hover { background: var(--color-primary-dark); }
+  .modal-btn-no { background: #f1f5f9; color: var(--color-text); border: 1px solid #cbd5e1; }
+  .modal-btn-no:hover { background: #e2e8f0; }
 </style>
