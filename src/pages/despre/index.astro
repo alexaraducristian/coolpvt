@@ -1,0 +1,80 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Despre — CoolPVT">
+  <section class="about-page">
+    <h1>Despre CoolPVT</h1>
+
+    <div class="content">
+      <p>
+        <strong>CoolPVT</strong> este un simulator de dimensionare a sistemelor fotovoltaice termice (PVT)
+        destinat pieței din România. Aplicația permite calculul complet al unui sistem fotovoltaic,
+        de la selectarea locației și orientării panourilor, până la analiza economică pe 20 de ani.
+      </p>
+
+      <h2>Funcționalități</h2>
+      <ul>
+        <li>Dimensionare sistem PV pe baza consumului energetic</li>
+        <li>Baza de date cu radiația solară pentru 7 regiuni din România</li>
+        <li>Suport pentru multiple orientări (SUD, SUD-EST, SUD-VEST, EST, VEST)</li>
+        <li>Unghiuri de înclinare de la 5° la 90°</li>
+        <li>Calculator consumatori electrici rezidențiali</li>
+        <li>Dimensionare electrică (invertor, cabluri, protecții)</li>
+        <li>Componenta termică — răcire panouri PV cu apă</li>
+        <li>Analiză economică cu grafic amortizare pe 20 de ani</li>
+        <li>Export raport PDF</li>
+      </ul>
+
+      <h2>Baza de date panouri fotovoltaice</h2>
+      <p>
+        Aplicația include o bază de date cu peste 20 de tipuri de panouri fotovoltaice,
+        de la 280 Wp (policristalin) la 670 Wp (monocristalin), cu parametrii electrici
+        și de randament actualizați.
+      </p>
+
+      <h2>Autori</h2>
+      <p>
+        Dezvoltat de <strong>Marius Alexa</strong> și <strong>Valeriu-Sebastian Hudisteanu</strong>
+        în cadrul cercetărilor legate de sistemele fotovoltaice termice.
+      </p>
+
+      <h2>Versiune</h2>
+      <p>Versiune: 6.0.0 — Versiune web (Astro)</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .about-page h1 {
+    font-size: 2rem;
+    color: var(--color-primary-dark);
+    margin-bottom: 1.5rem;
+  }
+
+  .content {
+    max-width: 750px;
+  }
+
+  .content p {
+    margin-bottom: 1rem;
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .content h2 {
+    font-size: 1.3rem;
+    color: var(--color-primary-dark);
+    margin: 2rem 0 0.75rem;
+  }
+
+  .content ul {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .content li {
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+</style>

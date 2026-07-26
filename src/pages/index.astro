@@ -1,0 +1,118 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="CoolPVT — Simulator fotovoltaic termic">
+  <section class="hero">
+    <h1>CoolPVT</h1>
+    <p class="subtitle">Simulator de dimensionare sistem fotovoltaic termic</p>
+    <p class="description">
+      Aplicație de dimensionare a sistemelor fotovoltaice termice (PVT) pentru România.
+      Calculează producția de energie electrică și termică, dimensionarea electrică,
+      analiza economică și amortizarea investiției.
+    </p>
+    <a href="/coolpvt/simulator/" class="cta-button">Deschide Simulatorul</a>
+  </section>
+
+  <section class="features">
+    <div class="feature-card">
+      <h3>☀️ Radiație solară</h3>
+      <p>Bază de date completă cu radiația solară pentru 7 regiuni din România, pe orientări și unghiuri de înclinare.</p>
+    </div>
+    <div class="feature-card">
+      <h3>⚡ Dimensionare electrică</h3>
+      <p>Calcul automat al numărului de panouri, invertor, secțiuni cabluri și protecții electrice.</p>
+    </div>
+    <div class="feature-card">
+      <h3>🌡️ Componenta termică</h3>
+      <p>Simulare răcire panouri PV cu apă — calcul temperaturi și energie termică produsă.</p>
+    </div>
+    <div class="feature-card">
+      <h3>💰 Analiză economică</h3>
+      <p>Estimare amortizare investiție pe 20 de ani, cu factori de inflație și degradare randament.</p>
+    </div>
+    <div class="feature-card">
+      <h3>🏠 Calculator consum</h3>
+      <p>Introducere detaliată a consumatorilor electrici din locuință pentru dimensionare precisă.</p>
+    </div>
+    <div class="feature-card">
+      <h3>📄 Raport PDF</h3>
+      <p>Generare raport complet de dimensionare, exportabil în format PDF.</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 3rem 0;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    color: var(--color-primary-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .description {
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+  }
+
+  .cta-button {
+    display: inline-block;
+    background: var(--color-primary);
+    color: white;
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .cta-button:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 0;
+  }
+
+  .feature-card {
+    background: var(--color-surface);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    transition: box-shadow 0.2s;
+  }
+
+  .feature-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .feature-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary-dark);
+  }
+
+  .feature-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+</style>

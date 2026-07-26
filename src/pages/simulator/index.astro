@@ -1,0 +1,305 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Simulator — CoolPVT">
+  <section class="simulator-page">
+    <h1>Simulator PVT</h1>
+    <p class="intro">Dimensionarea sistemului fotovoltaic termic se face în pași simpli.</p>
+
+    <div class="wizard">
+      <div class="step">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h2>Selectare locație</h2>
+        </div>
+        <div class="step-content">
+          <label for="judet">Județ / Localitate:</label>
+          <select id="judet">
+            <option value="iasi">Iași</option>
+            <option value="bucuresti">București</option>
+            <option value="cluj">Cluj</option>
+            <option value="constanta">Constanța</option>
+            <option value="craiova">Craiova</option>
+            <option value="galati">Galați</option>
+            <option value="timisoara">Timișoara</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h2>Perioadă dimensionare</h2>
+        </div>
+        <div class="step-content">
+          <label for="perioada">Perioadă:</label>
+          <select id="perioada">
+            <option value="vara">VARA</option>
+            <option value="iarna">IARNA</option>
+            <option value="anual" selected>ANUAL</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h2>Orientare panouri</h2>
+        </div>
+        <div class="step-content">
+          <label for="orientare">Orientare:</label>
+          <select id="orientare">
+            <option value="SUD">SUD</option>
+            <option value="SUD-EST">SUD-EST</option>
+            <option value="SUD-VEST">SUD-VEST</option>
+            <option value="EST">EST</option>
+            <option value="VEST">VEST</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-number">4</span>
+          <h2>Unghi de înclinare</h2>
+        </div>
+        <div class="step-content">
+          <label for="unghi">Unghi (grade):</label>
+          <select id="unghi">
+            <option value="5">5°</option>
+            <option value="10">10°</option>
+            <option value="15">15°</option>
+            <option value="20">20°</option>
+            <option value="25">25°</option>
+            <option value="30">30°</option>
+            <option value="35" selected>35°</option>
+            <option value="40">40°</option>
+            <option value="45">45°</option>
+            <option value="50">50°</option>
+            <option value="55">55°</option>
+            <option value="60">60°</option>
+            <option value="65">65°</option>
+            <option value="70">70°</option>
+            <option value="75">75°</option>
+            <option value="80">80°</option>
+            <option value="85">85°</option>
+            <option value="90">90°</option>
+          </select>
+          <p class="hint" id="sugestie">Înclinare optimă = 35°</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-header">
+          <span class="step-number">5</span>
+          <h2>Consum energie</h2>
+        </div>
+        <div class="step-content">
+          <label for="consum">Consum lunar estimat (kWh):</label>
+          <input type="number" id="consum" value="300" min="0" step="10" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="btn-calculeaza" class="btn-primary">Calculează</button>
+      </div>
+
+      <div class="results" id="results" style="display: none;">
+        <h2>Rezultate</h2>
+        <div class="results-grid">
+          <div class="result-item">
+            <span class="result-label">Nr. panouri necesare</span>
+            <span class="result-value" id="res-panouri">—</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Putere instalată</span>
+            <span class="result-value" id="res-putere">—</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Suprafață totală</span>
+            <span class="result-value" id="res-suprafata">—</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Energie produsă anual</span>
+            <span class="result-value" id="res-energie">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  document.getElementById('btn-calculeaza')?.addEventListener('click', () => {
+    const consum = parseFloat((document.getElementById('consum') as HTMLInputElement).value) || 300;
+
+    // Calcul simplificat de demonstrație
+    const energieZilnica = consum / 30;
+    const putereNecesara = energieZilnica / 4.5; // ore solare medii
+    const puterePanel = 0.45; // kWp per panou (450W)
+    const nrPanouri = Math.ceil(putereNecesara / puterePanel);
+    const putereInstalata = nrPanouri * puterePanel;
+    const suprafata = nrPanouri * 2.1 * 1.05; // dimensiuni standard panou
+    const energieAnuala = putereInstalata * 1200; // kWh/kWp/an media România
+
+    document.getElementById('res-panouri')!.textContent = `${nrPanouri} buc`;
+    document.getElementById('res-putere')!.textContent = `${putereInstalata.toFixed(2)} kWp`;
+    document.getElementById('res-suprafata')!.textContent = `${suprafata.toFixed(1)} m²`;
+    document.getElementById('res-energie')!.textContent = `${energieAnuala.toFixed(0)} kWh/an`;
+    document.getElementById('results')!.style.display = 'block';
+  });
+</script>
+
+<style>
+  .simulator-page {
+    padding: 1rem 0;
+  }
+
+  .simulator-page h1 {
+    font-size: 2rem;
+    color: var(--color-primary-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .intro {
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .wizard {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .step {
+    background: var(--color-surface);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .step-header h2 {
+    font-size: 1.1rem;
+    color: var(--color-primary-dark);
+  }
+
+  .step-content {
+    padding-left: 2.75rem;
+  }
+
+  label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+
+  select, input[type="number"] {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: white;
+    color: var(--color-text);
+  }
+
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+  }
+
+  .hint {
+    margin-top: 0.5rem;
+    color: var(--color-accent);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.875rem 2.5rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .results {
+    background: #ecfdf5;
+    border: 1px solid #6ee7b7;
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .results h2 {
+    color: #065f46;
+    margin-bottom: 1rem;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .result-label {
+    font-size: 0.85rem;
+    color: #047857;
+    font-weight: 500;
+  }
+
+  .result-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #065f46;
+  }
+</style>
