@@ -339,7 +339,7 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
   updateSugestie();
 
   // Calcul dimensionare
-  document.getElementById('btn-calculeaza')!.addEventListener('click', () => {
+  function calculeaza() {
     const modalitate = (document.querySelector('input[name="modalitate"]:checked') as HTMLInputElement).value;
     const consumLunar = parseFloat((document.getElementById('consum-lunar') as HTMLInputElement).value) || 300;
     const putereDorita = parseFloat((document.getElementById('putere-instalata') as HTMLInputElement).value) || 5;
@@ -348,6 +348,7 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
     const orientare = (document.getElementById('orientare') as HTMLSelectElement).value;
     const unghi = parseInt((document.getElementById('unghi') as HTMLSelectElement).value);
     const perioada = (document.getElementById('perioada') as HTMLSelectElement).value;
+    const racireActiva = (document.getElementById('check-racire') as HTMLInputElement).checked;
     const opt = panouSelect.selectedOptions[0];
     const puterePanel = parseFloat(opt.dataset.putere || '450') / 1000; // kWp
     const randPV = parseFloat(opt.dataset.rand || '20');
@@ -361,6 +362,12 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
     // Coeficient corectie randament = randament panou / randament standard
     const coefCorectie = randPV / randStandard;
 
+    // Coeficienti de racire PV per luna (apr-sept au bonus, restul = 1)
+    // Metoda 1 (disipator orizontal) ca default
+    const coefRacire = racireActiva
+      ? [1, 1, 1, 1.0296, 1.0411, 1.0411, 1.0535, 1.0535, 1.0296, 1, 1, 1]
+      : [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+
     // Energie produsa pe mp pe luna de dimensionare
     let energieDimensionare: number;
     if (perioada === 'VARA') {
@@ -372,15 +379,17 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
       energieDimensionare = solarLunar.reduce((a, b) => a + b, 0) / 12;
     }
 
-    // Energie anuala per mp (suma lunilor)
-    const energieAnualaPerMp = solarLunar.reduce((a, b) => a + b, 0);
+    // Energie anuala per mp (suma lunilor cu coeficient racire)
+    let energieAnualaPerMp = 0;
+    for (let m = 0; m < 12; m++) {
+      energieAnualaPerMp += solarLunar[m] * coefRacire[m];
+    }
 
     let nrPanouri: number;
     if (modalitate === 'putere') {
       nrPanouri = Math.ceil(putereDorita / puterePanel);
     } else {
       // Calcul nr panouri pe baza consumului si radiatiei locale
-      const consumZilnic = consumLunar / 30; // kWh/zi
       const supNecesara = consumLunar / (energieDimensionare * coefCorectie * randInvertor);
       nrPanouri = Math.ceil(supNecesara / supPanel);
       if (nrPanouri < 1) nrPanouri = 1;
@@ -402,7 +411,35 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
     document.getElementById('res-energie-an20')!.textContent = `${energieAn20.toFixed(0)} kWh`;
     document.getElementById('res-energie-luna')!.textContent = `${energieLuna.toFixed(0)} kWh/lună`;
     document.getElementById('results')!.style.display = 'block';
+  }
+
+  // Butonul principal de calcul
+  document.getElementById('btn-calculeaza')!.addEventListener('click', () => {
+    calculeaza();
     document.getElementById('results')!.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Recalculare automata la schimbarea oricarui parametru (daca rezultatele sunt deja vizibile)
+  function autoRecalc() {
+    if (document.getElementById('results')!.style.display !== 'none') {
+      calculeaza();
+    }
+  }
+
+  // Atasare event listeners pe toate inputurile relevante
+  const recalcIds = ['judet', 'orientare', 'unghi', 'perioada', 'panou-pv', 'consum-lunar', 'putere-instalata', 'randament-invertor', 'check-racire', 'check-racire-pvt'];
+  recalcIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', autoRecalc);
+      if (el.tagName === 'INPUT' && (el as HTMLInputElement).type === 'number') {
+        el.addEventListener('input', autoRecalc);
+      }
+    }
+  });
+  // Radio buttons modalitate
+  document.querySelectorAll('input[name="modalitate"]').forEach(r => {
+    r.addEventListener('change', autoRecalc);
   });
 </script>
 
