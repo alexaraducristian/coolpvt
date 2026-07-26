@@ -105,14 +105,14 @@ const consumatori = [
     const totalValue = parseFloat(totalText.replace(' kWh', '')) || 0;
     // Popup confirmare
     const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `<div class="modal-box">
-      <h3>Confirmare consum calculat</h3>
-      <p>Consumul lunar total calculat este <strong>${totalValue.toFixed(1)} kWh/lună</strong>.</p>
-      <p>Doriți să folosiți această valoare pentru dimensionarea sistemului fotovoltaic?</p>
-      <div class="modal-actions">
-        <button class="modal-btn modal-btn-yes" id="modal-yes">Da, folosește</button>
-        <button class="modal-btn modal-btn-no" id="modal-no">Nu, rămân aici</button>
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(2px);';
+    modal.innerHTML = `<div style="background:white;border-radius:12px;padding:2rem;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn 0.2s ease;">
+      <h3 style="font-size:1.1rem;color:#0a2f4e;margin-bottom:0.75rem;">Confirmare consum calculat</h3>
+      <p style="color:#1a2332;margin-bottom:0.5rem;font-size:0.95rem;">Consumul lunar total calculat este <strong style="color:#0f4c81;font-size:1.15rem;">${totalValue.toFixed(1)} kWh/lună</strong>.</p>
+      <p style="color:#5a6b7b;font-size:0.9rem;">Doriți să folosiți această valoare pentru dimensionarea sistemului fotovoltaic?</p>
+      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+        <button id="modal-yes" style="padding:0.6rem 1.25rem;border-radius:6px;font-size:0.95rem;font-weight:600;cursor:pointer;border:none;background:#0f4c81;color:white;">Da, folosește</button>
+        <button id="modal-no" style="padding:0.6rem 1.25rem;border-radius:6px;font-size:0.95rem;font-weight:600;cursor:pointer;border:1px solid #dce3eb;background:#f4f6f9;color:#1a2332;">Nu, rămân aici</button>
       </div>
     </div>`;
     document.body.appendChild(modal);
@@ -159,8 +159,8 @@ const consumatori = [
   .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
   .btn-primary:hover { background: var(--color-primary-dark); }
   .btn-secondary { background: #f1f5f9; color: var(--color-primary); border: 1px solid #cbd5e1; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
-  .modal-box { background: white; border-radius: 12px; padding: 2rem; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; backdrop-filter: blur(2px); }
+  .modal-box { background: white; border-radius: 12px; padding: 2rem; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: modalIn 0.2s ease; }
   .modal-box h3 { font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 0.75rem; }
   .modal-box p { color: var(--color-text); margin-bottom: 0.5rem; font-size: 0.95rem; }
   .modal-box strong { color: var(--color-primary); }

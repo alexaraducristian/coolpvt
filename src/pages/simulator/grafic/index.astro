@@ -7,7 +7,7 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
   <p class="intro">Vizualizare sold cumulat economii vs. investiție pe 20 de ani.</p>
 
   <div class="card">
-    <h2>Parametri grafic</h2>
+    <h2>Parametri</h2>
     <div class="grid-2">
       <div class="field">
         <label for="g-investitie">Investiție totală [RON]:</label>
@@ -33,40 +33,33 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
     <button type="button" id="btn-grafic" class="btn-primary">Generează Grafic</button>
   </div>
 
-  <div class="card" id="chart-container" style="display:none;">
-    <h2>Grafic Amortizare (20 ani)</h2>
-    <canvas id="chart-amortizare" width="800" height="400"></canvas>
-    <p class="legend">
-      <span class="leg-bar">■</span> Sold cumulat (economii - investiție) |
-      <span class="leg-line">—</span> Linia de amortizare (sold = 0)
-    </p>
+  <div class="card chart-card" id="chart-container" style="display:none;">
+    <div class="chart-header">
+      <h2>Sold cumulat economii − investiție</h2>
+      <div class="chart-legend">
+        <span class="legend-item legend-pos">● Profit</span>
+        <span class="legend-item legend-neg">● Neamortizat</span>
+        <span class="legend-item legend-line">— Prag amortizare</span>
+      </div>
+    </div>
+    <div class="chart-wrapper">
+      <canvas id="chart-amortizare" width="900" height="420"></canvas>
+    </div>
+    <div class="chart-summary" id="chart-summary"></div>
   </div>
 </SimulatorLayout>
 
 <script>
   // Preluare parametri din URL (venind de la pagina Economic)
   const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('investitie')) {
-    (document.getElementById('g-investitie') as HTMLInputElement).value = urlParams.get('investitie')!;
-  }
-  if (urlParams.get('energie')) {
-    (document.getElementById('g-energie') as HTMLInputElement).value = urlParams.get('energie')!;
-  }
-  if (urlParams.get('pret')) {
-    (document.getElementById('g-pret-kwh') as HTMLInputElement).value = urlParams.get('pret')!;
-  }
-  if (urlParams.get('inflatie')) {
-    (document.getElementById('g-inflatie') as HTMLInputElement).value = urlParams.get('inflatie')!;
-  }
-  if (urlParams.get('degradare')) {
-    (document.getElementById('g-degradare') as HTMLInputElement).value = urlParams.get('degradare')!;
-  }
-  // Auto-generate grafic daca avem parametri din URL
-  if (urlParams.get('investitie')) {
-    setTimeout(() => document.getElementById('btn-grafic')!.click(), 100);
-  }
+  if (urlParams.get('investitie')) (document.getElementById('g-investitie') as HTMLInputElement).value = urlParams.get('investitie')!;
+  if (urlParams.get('energie')) (document.getElementById('g-energie') as HTMLInputElement).value = urlParams.get('energie')!;
+  if (urlParams.get('pret')) (document.getElementById('g-pret-kwh') as HTMLInputElement).value = urlParams.get('pret')!;
+  if (urlParams.get('inflatie')) (document.getElementById('g-inflatie') as HTMLInputElement).value = urlParams.get('inflatie')!;
+  if (urlParams.get('degradare')) (document.getElementById('g-degradare') as HTMLInputElement).value = urlParams.get('degradare')!;
+  if (urlParams.get('investitie')) setTimeout(() => document.getElementById('btn-grafic')!.click(), 150);
 
-  document.getElementById('btn-grafic')!.addEventListener('click', () => {
+  function drawChart() {
     const investitie = parseFloat((document.getElementById('g-investitie') as HTMLInputElement).value);
     const energieAn = parseFloat((document.getElementById('g-energie') as HTMLInputElement).value);
     const pretKwh = parseFloat((document.getElementById('g-pret-kwh') as HTMLInputElement).value);
@@ -75,87 +68,186 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
 
     const values: number[] = [];
     let cumul = 0;
+    let anAmortizare = -1;
     for (let i = 1; i <= 20; i++) {
       const e = energieAn * (1 - degradare * i);
       const p = pretKwh * Math.pow(1 + inflatie, i);
       cumul += e * p;
-      values.push(cumul - investitie);
+      const sold = cumul - investitie;
+      values.push(sold);
+      if (sold >= 0 && anAmortizare === -1) anAmortizare = i;
     }
 
     const canvas = document.getElementById('chart-amortizare') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d')!;
-    const w = canvas.width;
-    const h = canvas.height;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = 900 * dpr;
+    canvas.height = 420 * dpr;
+    canvas.style.width = '900px';
+    canvas.style.height = '420px';
+    ctx.scale(dpr, dpr);
+
+    const w = 900, h = 420;
     ctx.clearRect(0, 0, w, h);
 
-    const maxVal = Math.max(...values.map(Math.abs));
-    const padding = { top: 30, bottom: 40, left: 70, right: 20 };
-    const chartW = w - padding.left - padding.right;
-    const chartH = h - padding.top - padding.bottom;
-    const barW = chartW / 20 - 4;
+    const pad = { top: 40, bottom: 55, left: 80, right: 30 };
+    const chartW = w - pad.left - pad.right;
+    const chartH = h - pad.top - pad.bottom;
+    const maxAbs = Math.max(...values.map(Math.abs)) * 1.15;
+    const barGap = 6;
+    const barW = (chartW - barGap * 20) / 20;
+    const zeroY = pad.top + (maxAbs / (maxAbs * 2)) * chartH;
 
-    // Scale
-    const scale = chartH / (maxVal * 2.2);
-    const zeroY = padding.top + chartH * (maxVal * 1.1) / (maxVal * 2.2);
-
-    // Axes
-    ctx.strokeStyle = '#94a3b8';
+    // Background grid
+    ctx.strokeStyle = '#e8ecf0';
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding.left, padding.top);
-    ctx.lineTo(padding.left, h - padding.bottom);
-    ctx.lineTo(w - padding.right, h - padding.bottom);
-    ctx.stroke();
+    const gridSteps = 5;
+    for (let i = 0; i <= gridSteps * 2; i++) {
+      const y = pad.top + (i / (gridSteps * 2)) * chartH;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(w - pad.right, y);
+      ctx.stroke();
+    }
 
-    // Zero line
-    ctx.strokeStyle = '#dc2626';
+    // Zero line (prag amortizare)
+    ctx.strokeStyle = '#0f4c81';
     ctx.lineWidth = 2;
-    ctx.setLineDash([5, 3]);
+    ctx.setLineDash([8, 4]);
     ctx.beginPath();
-    ctx.moveTo(padding.left, zeroY);
-    ctx.lineTo(w - padding.right, zeroY);
+    ctx.moveTo(pad.left, zeroY);
+    ctx.lineTo(w - pad.right, zeroY);
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Bars
-    values.forEach((val, i) => {
-      const x = padding.left + i * (chartW / 20) + 2;
-      const barH = Math.abs(val) * scale;
-      const y = val >= 0 ? zeroY - barH : zeroY;
-      ctx.fillStyle = val >= 0 ? '#059669' : '#dc2626';
-      ctx.fillRect(x, y, barW, barH);
-
-      // Label
-      ctx.fillStyle = '#64748b';
-      ctx.font = '10px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(`${i + 1}`, x + barW / 2, h - padding.bottom + 15);
-    });
+    // Label zero
+    ctx.fillStyle = '#0f4c81';
+    ctx.font = '600 11px Inter, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('0 RON', pad.left - 8, zeroY + 4);
 
     // Y-axis labels
-    ctx.fillStyle = '#64748b';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText('0 RON', padding.left - 5, zeroY + 4);
-    ctx.fillText(`+${(maxVal * 1.1 / 1000).toFixed(0)}k`, padding.left - 5, padding.top + 10);
-    ctx.fillText(`-${(maxVal * 1.1 / 1000).toFixed(0)}k`, padding.left - 5, h - padding.bottom - 5);
+    ctx.fillStyle = '#5a6b7b';
+    ctx.font = '500 10px Inter, sans-serif';
+    for (let i = 1; i <= gridSteps; i++) {
+      const valPos = (maxAbs * i / gridSteps);
+      const yPos = zeroY - (valPos / maxAbs) * (chartH / 2);
+      const yNeg = zeroY + (valPos / maxAbs) * (chartH / 2);
+      ctx.textAlign = 'right';
+      ctx.fillText(`+${(valPos/1000).toFixed(0)}k`, pad.left - 8, yPos + 4);
+      ctx.fillText(`-${(valPos/1000).toFixed(0)}k`, pad.left - 8, yNeg + 4);
+    }
+
+    // Bars
+    values.forEach((val, i) => {
+      const x = pad.left + i * (barW + barGap) + barGap / 2;
+      const barH = (Math.abs(val) / maxAbs) * (chartH / 2);
+      const y = val >= 0 ? zeroY - barH : zeroY;
+
+      // Gradient bar
+      const grad = ctx.createLinearGradient(x, y, x, y + barH);
+      if (val >= 0) {
+        grad.addColorStop(0, '#0d9e52');
+        grad.addColorStop(1, '#0d7a3e');
+      } else {
+        grad.addColorStop(0, '#e74c3c');
+        grad.addColorStop(1, '#c0392b');
+      }
+      ctx.fillStyle = grad;
+
+      // Rounded top corners
+      const r = 3;
+      ctx.beginPath();
+      if (val >= 0) {
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + barW - r, y);
+        ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+        ctx.lineTo(x + barW, y + barH);
+        ctx.lineTo(x, y + barH);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+      } else {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + barW, y);
+        ctx.lineTo(x + barW, y + barH - r);
+        ctx.quadraticCurveTo(x + barW, y + barH, x + barW - r, y + barH);
+        ctx.lineTo(x + r, y + barH);
+        ctx.quadraticCurveTo(x, y + barH, x, y + barH - r);
+        ctx.lineTo(x, y);
+      }
+      ctx.fill();
+
+      // Value on bar
+      ctx.fillStyle = val >= 0 ? '#065f46' : '#7f1d1d';
+      ctx.font = '600 9px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      const valText = (val / 1000).toFixed(0) + 'k';
+      const labelY = val >= 0 ? y - 6 : y + barH + 12;
+      ctx.fillText(valText, x + barW / 2, labelY);
+
+      // X-axis label (year)
+      ctx.fillStyle = '#5a6b7b';
+      ctx.font = '500 10px Inter, sans-serif';
+      ctx.fillText(`${i + 1}`, x + barW / 2, h - pad.bottom + 18);
+    });
+
+    // X-axis title
+    ctx.fillStyle = '#5a6b7b';
+    ctx.font = '500 11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('An', w / 2, h - 8);
+
+    // Amortization marker
+    if (anAmortizare > 0) {
+      const markerX = pad.left + (anAmortizare - 1) * (barW + barGap) + barGap / 2 + barW / 2;
+      ctx.fillStyle = '#0f4c81';
+      ctx.font = '700 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`▼ Amortizare: anul ${anAmortizare}`, markerX, pad.top - 10);
+    }
+
+    // Summary
+    const totalEconomii = values[19] + investitie;
+    const summaryEl = document.getElementById('chart-summary')!;
+    summaryEl.innerHTML = `
+      <div class="summary-item"><span>Investiție</span><strong>${investitie.toLocaleString('ro-RO')} RON</strong></div>
+      <div class="summary-item success"><span>Perioadă amortizare</span><strong>${anAmortizare > 0 ? anAmortizare + ' ani' : '>20 ani'}</strong></div>
+      <div class="summary-item"><span>Sold final (an 20)</span><strong>${values[19] > 0 ? '+' : ''}${values[19].toLocaleString('ro-RO', {maximumFractionDigits: 0})} RON</strong></div>
+      <div class="summary-item"><span>Economii totale 20 ani</span><strong>${totalEconomii.toLocaleString('ro-RO', {maximumFractionDigits: 0})} RON</strong></div>
+    `;
 
     document.getElementById('chart-container')!.style.display = 'block';
-  });
+  }
+
+  document.getElementById('btn-grafic')!.addEventListener('click', drawChart);
 </script>
 
 <style>
-  h1 { font-size: 1.8rem; color: var(--color-primary-dark); margin-bottom: 0.5rem; }
-  .intro { color: var(--color-text-muted); margin-bottom: 1.5rem; }
-  .card { background: var(--color-surface); border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
-  .card h2 { font-size: 1.1rem; color: var(--color-primary-dark); margin-bottom: 1rem; }
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; margin-bottom: 1rem; }
-  .field label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.25rem; }
-  .field input { width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; }
-  .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-  .btn-primary:hover { background: var(--color-primary-dark); }
-  canvas { width: 100%; max-width: 800px; height: auto; display: block; margin: 0 auto; }
-  .legend { text-align: center; margin-top: 0.75rem; font-size: 0.85rem; color: var(--color-text-muted); }
-  .leg-bar { color: #059669; }
-  .leg-line { color: #dc2626; }
+  h1 { font-size: 1.6rem; color: var(--color-primary-dark); margin-bottom: 0.4rem; font-weight: 700; }
+  .intro { color: var(--color-text-muted); margin-bottom: 1.5rem; font-size: 0.9rem; }
+  .card { background: var(--color-surface); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); margin-bottom: 1.5rem; }
+  .card h2 { font-size: 1rem; color: var(--color-primary-dark); margin-bottom: 1rem; font-weight: 600; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+  .field label { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.2rem; color: var(--color-text-muted); }
+  .field input { width: 100%; padding: 0.5rem 0.7rem; border: 1px solid var(--color-border); border-radius: var(--radius); font-size: 0.88rem; font-family: var(--font); }
+  .field input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(15,76,129,0.1); }
+  .btn-primary { background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: var(--radius); font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: var(--font); box-shadow: 0 3px 10px rgba(15,76,129,0.25); transition: all 0.2s; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(15,76,129,0.35); }
+
+  .chart-card { padding: 1.5rem; }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+  .chart-header h2 { margin: 0; }
+  .chart-legend { display: flex; gap: 1rem; font-size: 0.78rem; color: var(--color-text-muted); }
+  .legend-pos { color: #0d7a3e; }
+  .legend-neg { color: #c0392b; }
+  .legend-line { color: #0f4c81; }
+
+  .chart-wrapper { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius); background: #fafbfc; padding: 0.5rem; }
+  canvas { display: block; max-width: 100%; height: auto; }
+
+  .chart-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 0.75rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--color-border); }
+  .chart-summary .summary-item { background: var(--color-surface-alt); padding: 0.75rem 1rem; border-radius: var(--radius); border: 1px solid var(--color-border); }
+  .chart-summary .summary-item span { display: block; font-size: 0.72rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
+  .chart-summary .summary-item strong { font-size: 1.15rem; color: var(--color-primary-dark); }
+  .chart-summary .summary-item.success strong { color: var(--color-success); }
 </style>
