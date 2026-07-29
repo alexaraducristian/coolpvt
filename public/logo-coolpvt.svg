@@ -1,8 +1,8 @@
 <svg width="500" height="160" viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="gradC" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#004D40;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#00897B;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#E65100;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF9800;stop-opacity:1" />
     </linearGradient>
     <linearGradient id="gradCb" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" style="stop-color:#FFD600;stop-opacity:1" />
@@ -10,21 +10,26 @@
     </linearGradient>
   </defs>
 
-  <!-- Larger rounded square with C -->
+  <!-- Rounded square with orange gradient -->
   <rect x="10" y="10" width="120" height="120" rx="24" fill="url(#gradC)" />
 
-  <!-- Bold stylized C - matching the A style -->
+  <!-- Bold stylized C in white -->
   <path d="M90 35 L75 28 L58 35 L45 55 L42 80 L45 100 L58 115 L75 122 L90 115" 
-        fill="none" stroke="url(#gradCb)" stroke-width="14" 
+        fill="none" stroke="white" stroke-width="14" 
         stroke-linecap="round" stroke-linejoin="round" />
 
-  <!-- Text "oolPVT" -->
+  <!-- Text "ool" in orange -->
   <text x="145" y="88" font-family="'Segoe UI', Arial, sans-serif" 
-        font-size="62" font-weight="900" fill="#004D40" 
-        letter-spacing="-2">oolPVT</text>
+        font-size="62" font-weight="900" fill="#E65100" 
+        letter-spacing="-2">ool</text>
+
+  <!-- Text "PVT" in dark/black -->
+  <text x="285" y="88" font-family="'Segoe UI', Arial, sans-serif" 
+        font-size="62" font-weight="900" fill="#1a1a2e" 
+        letter-spacing="-2">PVT</text>
 
   <!-- Thick separator line -->
-  <rect x="145" y="100" width="300" height="3" rx="1.5" fill="#00897B" opacity="0.6" />
+  <rect x="145" y="100" width="300" height="3" rx="1.5" fill="#E65100" opacity="0.5" />
 
   <!-- Subtitle -->
   <text x="295" y="132" font-family="Arial, sans-serif" font-size="18" 
