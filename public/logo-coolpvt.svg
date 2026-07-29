@@ -13,10 +13,10 @@
   <!-- Rounded square with orange gradient -->
   <rect x="10" y="10" width="120" height="120" rx="24" fill="url(#gradC)" />
 
-  <!-- Bold stylized C in white -->
-  <path d="M90 35 L75 28 L58 35 L45 55 L42 80 L45 100 L58 115 L75 122 L90 115" 
+  <!-- Bold stylized C - round arc -->
+  <path d="M88 40 C72 28 52 32 42 50 C32 68 32 88 42 106 C52 122 72 126 88 114" 
         fill="none" stroke="white" stroke-width="14" 
-        stroke-linecap="round" stroke-linejoin="round" />
+        stroke-linecap="round" />
 
   <!-- Text "ool" in orange -->
   <text x="145" y="88" font-family="'Segoe UI', Arial, sans-serif" 
