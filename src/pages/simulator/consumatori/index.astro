@@ -108,7 +108,7 @@ const defaultChecked = ['led', 'centrala', 'boiler', 'frigider', 'masina-spalat'
     const totalText = document.getElementById('total-lunar')!.textContent || '0';
     const totalValue = parseFloat(totalText.replace(' kWh', '')) || 0;
     if (confirm(`Consumul lunar total calculat: ${totalValue.toFixed(1)} kWh/lună.\n\nDoriți să folosiți această valoare pentru dimensionarea sistemului fotovoltaic?`)) {
-      window.location.href = '/coolpvt/simulator/?consum=' + totalValue.toFixed(1);
+      window.location.href = '/simulator/?consum=' + totalValue.toFixed(1);
     }
   });
 

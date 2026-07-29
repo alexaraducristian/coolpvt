@@ -126,7 +126,7 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
 
     // Update link grafic cu parametri
     const linkGrafic = document.getElementById('link-grafic') as HTMLAnchorElement;
-    linkGrafic.href = `/coolpvt/simulator/grafic/?investitie=${investitie.toFixed(0)}&energie=${energieAn}&pret=${pretKwh}&inflatie=${(inflatie*100).toFixed(1)}&degradare=${(degradare*100).toFixed(2)}`;
+    linkGrafic.href = `/simulator/grafic/?investitie=${investitie.toFixed(0)}&energie=${energieAn}&pret=${pretKwh}&inflatie=${(inflatie*100).toFixed(1)}&degradare=${(degradare*100).toFixed(2)}`;
   });
 </script>
 
