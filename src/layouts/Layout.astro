@@ -1,58 +1,101 @@
 ---
+import '../styles/global.css';
+
 interface Props {
   title: string;
+  description?: string;
   activeNav?: string;
 }
 
-const { title, activeNav = '' } = Astro.props;
+const { title, description = 'CoolPVT — Simulator profesional de dimensionare sisteme fotovoltaice termice. Dezvoltat la Universitatea Tehnică Gheorghe Asachi Iași.', activeNav = '' } = Astro.props;
 const base = '/coolpvt';
+const siteBase = '';
 ---
 
 <!doctype html>
 <html lang="ro">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="CoolPVT - Simulator dimensionare sistem fotovoltaic termic" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href={`${base}/favicon.ico`} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="AlexaVolt" />
+    <meta property="og:locale" content="ro_RO" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>
   </head>
-  <body>
-    <header>
-      <nav>
-        <a href={`${base}/`} class="logo">
-          <span class="logo-icon">⚡</span>
-          <span class="logo-text">Cool<span class="logo-accent">PVT</span></span>
+  <body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 font-sans">
+    
+    <!-- Header matching main site style -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 flex items-center justify-between py-4">
+        <a href={`${base}/`} class="flex items-center gap-2 font-black text-xl text-slate-900">
+          <span class="text-2xl">⚡</span>
+          <span>Cool<span class="text-orange-500">PVT</span></span>
         </a>
-        <div class="nav-links">
-          <a href={`${base}/`} class={activeNav === 'home' ? 'active' : ''}>Acasă</a>
-          <a href={`${base}/simulator/`} class={activeNav === 'simulator' ? 'active' : ''}>Simulator</a>
-          <a href={`${base}/despre/`} class={activeNav === 'despre' ? 'active' : ''}>Despre</a>
+
+        <nav class="hidden md:flex items-center gap-2">
+          <a href={`${base}/`} class:list={["px-3 py-2 rounded-xl text-sm font-bold transition-all", activeNav === 'home' ? "bg-blue-600 text-white shadow-lg" : "text-slate-700 hover:bg-slate-100 hover:text-blue-600"]}>
+            Acasă
+          </a>
+          <a href={`${base}/simulator/`} class:list={["px-3 py-2 rounded-xl text-sm font-bold transition-all", activeNav === 'simulator' ? "bg-blue-600 text-white shadow-lg" : "text-slate-700 hover:bg-slate-100 hover:text-blue-600"]}>
+            Simulator
+          </a>
+          <a href={`${base}/despre/`} class:list={["px-3 py-2 rounded-xl text-sm font-bold transition-all", activeNav === 'despre' ? "bg-blue-600 text-white shadow-lg" : "text-slate-700 hover:bg-slate-100 hover:text-blue-600"]}>
+            Despre
+          </a>
+          <span class="w-px h-6 bg-slate-200 mx-2"></span>
+          <a href={`${siteBase}/`} class="px-3 py-2 rounded-xl text-sm font-bold text-emerald-700 hover:bg-emerald-50 transition-all">
+            ← AlexaVolt.ro
+          </a>
+        </nav>
+
+        <!-- Mobile nav -->
+        <div class="md:hidden flex items-center gap-2">
+          <a href={`${base}/simulator/`} class="px-3 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white">
+            Simulator
+          </a>
         </div>
-      </nav>
+      </div>
     </header>
-    <main>
+
+    <main class="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-8">
       <slot />
     </main>
-    <footer>
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <span class="footer-logo">⚡ CoolPVT</span>
-          <p>Simulator profesional de dimensionare sisteme fotovoltaice termice</p>
+
+    <!-- Footer matching main site -->
+    <footer class="bg-slate-900 text-slate-400 mt-12">
+      <div class="max-w-6xl mx-auto px-6 py-10">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <p class="text-white font-bold text-lg">⚡ CoolPVT <span class="text-sm font-normal text-slate-500">v6.0</span></p>
+            <p class="text-sm mt-1">Simulator dimensionare sisteme fotovoltaice termice</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 text-sm">
+            <a href={`${siteBase}/`} class="text-blue-400 hover:text-white transition-colors">AlexaVolt.ro</a>
+            <a href={`${siteBase}/servicii/panouri-fotovoltaice/`} class="hover:text-white transition-colors">Montaj Fotovoltaice</a>
+            <a href={`${siteBase}/contact/`} class="hover:text-white transition-colors">Contact</a>
+          </div>
         </div>
-        <div class="footer-meta">
-          <p>&copy; {new Date().getFullYear()} CoolPVT v6.0</p>
-          <p>Dezvoltat de Marius Alexa & Valeriu-Sebastian Hudisteanu</p>
+        <div class="border-t border-slate-800 mt-6 pt-6 text-xs text-center">
+          <p>© {new Date().getFullYear()} CoolPVT — Dezvoltat de Marius Alexa & Valeriu-Sebastian Hudișteanu</p>
+          <p class="mt-1 text-slate-600">Universitatea Tehnică „Gheorghe Asachi" din Iași</p>
         </div>
       </div>
     </footer>
   </body>
 </html>
 
-<style is:global>
+<style>
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
+
   :root {
     --color-primary: #0f4c81;
     --color-primary-light: #1a6bb5;
@@ -76,114 +119,5 @@ const base = '/coolpvt';
     --radius-lg: 12px;
     --max-width: 1240px;
     --font: 'Inter', system-ui, -apple-system, sans-serif;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html {
-    font-family: var(--font);
-    background: var(--color-bg);
-    color: var(--color-text);
-    line-height: 1.6;
-    font-size: 15px;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body { min-height: 100vh; display: flex; flex-direction: column; }
-
-  main {
-    flex: 1;
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-    width: 100%;
-  }
-
-  /* Header */
-  header {
-    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-    color: white;
-    padding: 0 1.5rem;
-    box-shadow: var(--shadow-md);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  nav {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.875rem 0;
-  }
-
-  nav .logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-  }
-
-  .logo-icon {
-    font-size: 1.5rem;
-    filter: drop-shadow(0 0 4px rgba(232,140,48,0.5));
-  }
-
-  .logo-text {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: white;
-    letter-spacing: -0.02em;
-  }
-
-  .logo-accent {
-    color: var(--color-accent-light);
-  }
-
-  .nav-links { display: flex; gap: 0.25rem; }
-
-  .nav-links a {
-    color: rgba(255,255,255,0.85);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    padding: 0.5rem 0.875rem;
-    border-radius: 6px;
-    transition: all 0.2s;
-  }
-
-  .nav-links a:hover { background: rgba(255,255,255,0.1); color: white; }
-  .nav-links a.active { background: rgba(255,255,255,0.15); color: var(--color-accent-light); }
-
-  /* Footer */
-  footer {
-    background: var(--color-primary-dark);
-    color: rgba(255,255,255,0.7);
-    padding: 2rem 1.5rem;
-    margin-top: 2rem;
-    border-top: 3px solid var(--color-accent);
-  }
-
-  .footer-inner {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .footer-brand { display: flex; flex-direction: column; gap: 0.25rem; }
-  .footer-logo { font-weight: 700; font-size: 1.1rem; color: white; }
-  .footer-brand p { font-size: 0.8rem; opacity: 0.7; }
-  .footer-meta { text-align: right; font-size: 0.8rem; }
-  .footer-meta p + p { margin-top: 0.15rem; }
-
-  @media (max-width: 600px) {
-    .footer-inner { flex-direction: column; text-align: center; }
-    .footer-meta { text-align: center; }
   }
 </style>
