@@ -95,7 +95,7 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
       const data = JSON.parse(saved);
       if (data.nrPanouri) (document.getElementById('nr-panouri') as HTMLInputElement).value = data.nrPanouri.toString();
       if (data.energieAn1) (document.getElementById('energie-an') as HTMLInputElement).value = data.energieAn1.toString();
-      if (data.degAnual) (document.getElementById('degradare') as HTMLInputElement).value = (data.degAnual * 100).toFixed(2);
+      if (data.degAnual) (document.getElementById('degradare') as HTMLInputElement).value = data.degAnual.toFixed(2);
     } catch(e) {}
   }
 
