@@ -63,7 +63,27 @@ const defaultChecked = ['led', 'centrala', 'boiler', 'frigider', 'masina-spalat'
 
   <div class="extra-receptoare">
     <h3>Receptoare suplimentare (personalizate)</h3>
-    <div id="extra-container"></div>
+    <p class="extra-hint">Adaugă aparate care nu sunt în lista de mai sus.</p>
+    <table id="tbl-extra" class="tbl-extra">
+      <thead>
+        <tr>
+          <th>Nume receptor</th>
+          <th>Putere [W]</th>
+          <th>Ore/zi</th>
+          <th>Nr. buc</th>
+          <th>E lunar [kWh]</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="extra-body"></tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="4"><strong>TOTAL suplimentar</strong></td>
+          <td><strong id="extra-total-lunar">0 kWh</strong></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
     <button type="button" id="btn-add-receptor" class="btn-secondary">+ Adaugă receptor</button>
   </div>
 
@@ -73,7 +93,8 @@ const defaultChecked = ['led', 'centrala', 'boiler', 'frigider', 'masina-spalat'
 </SimulatorLayout>
 
 <script>
-  function recalculate() {
+  // Calcul total receptoare principale
+  function recalculateMain(): number {
     let totalZ = 0, totalL = 0;
     document.querySelectorAll('#tbl-consumatori tbody tr').forEach(row => {
       const chk = row.querySelector('.chk-activ') as HTMLInputElement;
@@ -93,32 +114,78 @@ const defaultChecked = ['led', 'centrala', 'boiler', 'frigider', 'masina-spalat'
     });
     document.getElementById('total-zilnic')!.textContent = totalZ.toFixed(2) + ' kWh';
     document.getElementById('total-lunar')!.textContent = totalL.toFixed(1) + ' kWh';
+    return totalL;
   }
 
+  // Calcul total receptoare suplimentare
+  function recalculateExtra(): number {
+    let totalL = 0;
+    document.querySelectorAll('#extra-body tr').forEach(row => {
+      const putere = parseFloat((row.querySelector('.ext-putere') as HTMLInputElement).value) || 0;
+      const ore = parseFloat((row.querySelector('.ext-ore') as HTMLInputElement).value) || 0;
+      const buc = parseFloat((row.querySelector('.ext-buc') as HTMLInputElement).value) || 0;
+      const el = (buc * putere * ore / 1000) * 30;
+      row.querySelector('.ext-lunar')!.textContent = el.toFixed(1);
+      totalL += el;
+    });
+    document.getElementById('extra-total-lunar')!.textContent = totalL.toFixed(1) + ' kWh';
+    return totalL;
+  }
+
+  function recalculateAll() {
+    recalculateMain();
+    recalculateExtra();
+  }
+
+  // Event listeners pe tabelul principal
   document.querySelectorAll('#tbl-consumatori input').forEach(inp => {
-    inp.addEventListener('change', recalculate);
-    inp.addEventListener('input', recalculate);
+    inp.addEventListener('change', recalculateAll);
+    inp.addEventListener('input', recalculateAll);
   });
 
-  // Calcul initial pentru consumatorii pre-selectati
-  recalculate();
+  // Calcul initial
+  recalculateAll();
 
-  document.getElementById('btn-confirma')!.addEventListener('click', () => {
-    recalculate();
-    const totalText = document.getElementById('total-lunar')!.textContent || '0';
-    const totalValue = parseFloat(totalText.replace(' kWh', '')) || 0;
-    if (confirm(`Consumul lunar total calculat: ${totalValue.toFixed(1)} kWh/lună.\n\nDoriți să folosiți această valoare pentru dimensionarea sistemului fotovoltaic?`)) {
-      window.location.href = '/simulator/?consum=' + totalValue.toFixed(1);
-    }
-  });
-
+  // Adaugă receptor suplimentar
   let extraCount = 0;
   document.getElementById('btn-add-receptor')!.addEventListener('click', () => {
     extraCount++;
-    const div = document.createElement('div');
-    div.className = 'extra-row';
-    div.innerHTML = `<input type="text" placeholder="Nume receptor" /><input type="number" placeholder="W" value="100" min="0" /><input type="number" placeholder="Ore" value="1" min="0" max="24" /><input type="number" placeholder="Buc" value="1" min="0" />`;
-    document.getElementById('extra-container')!.appendChild(div);
+    const tbody = document.getElementById('extra-body')!;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" class="ext-name" placeholder="Ex: Pompă recirculare" value="" /></td>
+      <td><input type="number" class="ext-putere" value="100" min="0" step="10" /></td>
+      <td><input type="number" class="ext-ore" value="2" min="0" max="24" step="0.5" /></td>
+      <td><input type="number" class="ext-buc" value="1" min="1" max="50" /></td>
+      <td class="ext-lunar">6.0</td>
+      <td><button type="button" class="btn-remove" title="Șterge">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+
+    // Atașare event listeners pe noile inputuri
+    tr.querySelectorAll('input[type="number"]').forEach(inp => {
+      inp.addEventListener('change', recalculateAll);
+      inp.addEventListener('input', recalculateAll);
+    });
+
+    // Buton ștergere
+    tr.querySelector('.btn-remove')!.addEventListener('click', () => {
+      tr.remove();
+      recalculateAll();
+    });
+
+    recalculateAll();
+  });
+
+  // Confirmă și revino — include AMBELE totaluri
+  document.getElementById('btn-confirma')!.addEventListener('click', () => {
+    const totalMain = recalculateMain();
+    const totalExtra = recalculateExtra();
+    const totalValue = totalMain + totalExtra;
+
+    if (confirm(`Consumul lunar total calculat: ${totalValue.toFixed(1)} kWh/lună\n(Principal: ${totalMain.toFixed(1)} kWh + Suplimentar: ${totalExtra.toFixed(1)} kWh)\n\nDoriți să folosiți această valoare pentru dimensionarea sistemului fotovoltaic?`)) {
+      window.location.href = '/simulator/?consum=' + totalValue.toFixed(1);
+    }
   });
 </script>
 
@@ -135,11 +202,16 @@ const defaultChecked = ['led', 'centrala', 'boiler', 'frigider', 'masina-spalat'
   input[type="number"] { padding: 0.3rem 0.4rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; }
   .total-row td { background: #ecfdf5; border-top: 2px solid #6ee7b7; }
   .extra-receptoare { margin-top: 1.5rem; background: var(--color-surface); border-radius: 12px; padding: 1.5rem; border: 1px solid #e2e8f0; }
-  .extra-receptoare h3 { font-size: 1rem; margin-bottom: 0.75rem; }
-  .extra-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-  .extra-row input { padding: 0.3rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; }
-  .extra-row input[type="text"] { flex: 2; }
-  .extra-row input[type="number"] { width: 70px; }
+  .extra-receptoare h3 { font-size: 1rem; margin-bottom: 0.25rem; color: var(--color-primary-dark); }
+  .extra-hint { font-size: 0.82rem; color: var(--color-text-muted); margin-bottom: 1rem; }
+  .tbl-extra { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 1rem; }
+  .tbl-extra th { background: #f8fafc; color: var(--color-text-muted); padding: 0.5rem; text-align: left; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 1px solid #e2e8f0; }
+  .tbl-extra td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  .tbl-extra .total-row td { background: #ecfdf5; border-top: 2px solid #6ee7b7; }
+  .tbl-extra input[type="text"] { width: 100%; min-width: 140px; }
+  .tbl-extra input[type="number"] { width: 70px; }
+  .btn-remove { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 0.25rem 0.5rem; border-radius: 4px; }
+  .btn-remove:hover { background: #fee2e2; }
   .actions { margin-top: 1.5rem; text-align: center; }
   .btn-primary { background: var(--color-primary); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
   .btn-primary:hover { background: var(--color-primary-dark); }
