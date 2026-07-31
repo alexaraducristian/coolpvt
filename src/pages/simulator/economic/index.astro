@@ -88,6 +88,17 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
 </SimulatorLayout>
 
 <script>
+  // Pre-fill din localStorage (rezultate dimensionare)
+  const saved = localStorage.getItem('coolpvt-rezultate');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      if (data.nrPanouri) (document.getElementById('nr-panouri') as HTMLInputElement).value = data.nrPanouri.toString();
+      if (data.energieAn1) (document.getElementById('energie-an') as HTMLInputElement).value = data.energieAn1.toString();
+      if (data.degAnual) (document.getElementById('degradare') as HTMLInputElement).value = (data.degAnual * 100).toFixed(2);
+    } catch(e) {}
+  }
+
   document.getElementById('btn-economic')!.addEventListener('click', () => {
     const nrPanouri = parseFloat((document.getElementById('nr-panouri') as HTMLInputElement).value);
     const pretPV = parseFloat((document.getElementById('pret-pv') as HTMLInputElement).value);

@@ -75,6 +75,19 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
 </SimulatorLayout>
 
 <script>
+  // Pre-fill din localStorage (rezultate dimensionare)
+  const saved = localStorage.getItem('coolpvt-rezultate');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      if (data.putereInstalata) (document.getElementById('pinst') as HTMLInputElement).value = data.putereInstalata.toString();
+      if (data.nrPanouri) {
+        (document.getElementById('npv') as HTMLInputElement).value = data.nrPanouri.toString();
+        (document.getElementById('npserie') as HTMLInputElement).value = data.nrPanouri.toString();
+      }
+    } catch(e) {}
+  }
+
   document.getElementById('btn-calc')!.addEventListener('click', () => {
     const npserie = parseFloat((document.getElementById('npserie') as HTMLInputElement).value);
     const nsiruri = parseFloat((document.getElementById('nsiruri') as HTMLInputElement).value);

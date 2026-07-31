@@ -44,38 +44,132 @@ import Layout from '../layouts/Layout.astro';
   </section>
 
   <section class="py-12">
-    <h2 class="text-2xl font-bold text-center text-slate-900 mb-8">Funcționalități</h2>
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-        <div class="text-3xl mb-3">☀️</div>
-        <h3 class="text-base font-bold text-slate-900 mb-2">Radiație solară</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">Bază de date cu radiația solară pentru 7 regiuni, pe orientări și unghiuri de la 5° la 90°.</p>
+    <h2 class="text-2xl font-bold text-center text-slate-900 mb-4">Fluxul de calcul</h2>
+    <p class="text-center text-slate-500 text-sm mb-10 max-w-2xl mx-auto">Datele calculate într-un pas sunt preluate automat în pașii următori — nu trebuie să re-introduci nimic manual.</p>
+
+    <div class="max-w-3xl mx-auto space-y-0">
+
+      <!-- Step 1: Consumatori -->
+      <div class="flex items-start gap-4">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">1</div>
+          <div class="w-0.5 h-full bg-blue-200 min-h-[40px]"></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex-1 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">🔌</span>
+            <h3 class="font-bold text-slate-900">Calculator Consumatori</h3>
+          </div>
+          <p class="text-sm text-slate-600 mb-2">Bifezi receptoarele electrice din casă. Se calculează consumul lunar total.</p>
+          <div class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg inline-block font-medium">↓ Trimite: consum lunar [kWh/lună]</div>
+        </div>
       </div>
-      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-        <div class="text-3xl mb-3">⚡</div>
-        <h3 class="text-base font-bold text-slate-900 mb-2">Dimensionare electrică</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">Calcul invertor, tensiuni DC, secțiuni cabluri și protecții electrice conform normativelor.</p>
+
+      <!-- Step 2: Dimensionare -->
+      <div class="flex items-start gap-4">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-sm shrink-0">2</div>
+          <div class="w-0.5 h-full bg-orange-200 min-h-[40px]"></div>
+        </div>
+        <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100 shadow-sm flex-1 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">☀️</span>
+            <h3 class="font-bold text-slate-900">Dimensionare Sistem PV</h3>
+            <span class="text-xs bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full font-semibold ml-auto">Pasul principal</span>
+          </div>
+          <p class="text-sm text-slate-600 mb-2">Selectezi locație, orientare, unghi, panou. Se calculează nr. panouri, putere instalată și energie produsă/an.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg font-medium">↓ nr. panouri</span>
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg font-medium">↓ putere [kWp]</span>
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg font-medium">↓ energie/an [kWh]</span>
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg font-medium">↓ degradare [%/an]</span>
+          </div>
+        </div>
       </div>
-      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-        <div class="text-3xl mb-3">🌡️</div>
-        <h3 class="text-base font-bold text-slate-900 mb-2">Componenta termică</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">Simulare răcire PV cu apă — temperaturi, debite și energie termică produsă lunar.</p>
+
+      <!-- Step 3: Calcul Electric -->
+      <div class="flex items-start gap-4">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">3</div>
+          <div class="w-0.5 h-full bg-blue-200 min-h-[40px]"></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex-1 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">⚡</span>
+            <h3 class="font-bold text-slate-900">Calcul Electric</h3>
+          </div>
+          <p class="text-sm text-slate-600 mb-2">Primește automat puterea instalată și nr. panouri. Calculează tensiuni DC, invertor, secțiuni cabluri și protecții.</p>
+          <div class="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg inline-block font-medium">← Primește: putere, nr. panouri</div>
+        </div>
       </div>
-      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-        <div class="text-3xl mb-3">💰</div>
-        <h3 class="text-base font-bold text-slate-900 mb-2">Analiză economică</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">Investiție, amortizare, inflație și economii detaliate pe 20 de ani cu grafic.</p>
+
+      <!-- Step 4: Racire PV -->
+      <div class="flex items-start gap-4">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">4</div>
+          <div class="w-0.5 h-full bg-blue-200 min-h-[40px]"></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex-1 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">💨</span>
+            <h3 class="font-bold text-slate-900">Răcire PV</h3>
+          </div>
+          <p class="text-sm text-slate-600 mb-2">Alegi metoda de răcire (disipator, pelicular, PVT). Coeficienții sunt aplicați automat în Dimensionare.</p>
+          <div class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg inline-block font-medium">↑ Trimite: coeficienți răcire → Dimensionare</div>
+        </div>
       </div>
-      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-        <div class="text-3xl mb-3">🔌</div>
-        <h3 class="text-base font-bold text-slate-900 mb-2">Calculator consum</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">Introducere detaliată a consumatorilor electrici cu calcul automat al consumului lunar.</p>
+
+      <!-- Step 5: Racire PVT -->
+      <div class="flex items-start gap-4">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">5</div>
+          <div class="w-0.5 h-full bg-blue-200 min-h-[40px]"></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex-1 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">💧</span>
+            <h3 class="font-bold text-slate-900">Răcire PVT (Termică)</h3>
+          </div>
+          <p class="text-sm text-slate-600 mb-2">Calculează energia termică produsă prin răcire cu apă (țeavă Cu). Primește automat nr. panouri.</p>
+          <div class="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg inline-block font-medium">← Primește: nr. panouri PVT</div>
+        </div>
       </div>
-      <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
-        <div class="text-3xl mb-3">📄</div>
-        <h3 class="text-base font-bold text-slate-900 mb-2">Raport complet</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">Rezultate sintetice cu toate datele necesare pentru implementarea sistemului PVT.</p>
+
+      <!-- Step 6: Economic -->
+      <div class="flex items-start gap-4">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">6</div>
+          <div class="w-0.5 h-full bg-blue-200 min-h-[40px]"></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex-1 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">💰</span>
+            <h3 class="font-bold text-slate-900">Analiză Economică</h3>
+          </div>
+          <p class="text-sm text-slate-600 mb-2">Primește automat nr. panouri, energie/an și degradare. Calculează investiția totală, amortizarea și economiile pe 20 ani.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg font-medium">← nr. panouri, energie/an, degradare</span>
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg font-medium">↓ investiție, inflație, preț kWh</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Step 7: Grafic -->
+      <div class="flex items-start gap-4">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0">7</div>
+        </div>
+        <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 shadow-sm flex-1 mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">📊</span>
+            <h3 class="font-bold text-slate-900">Grafic Amortizare</h3>
+            <span class="text-xs bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-semibold ml-auto">Rezultat final</span>
+          </div>
+          <p class="text-sm text-slate-600 mb-2">Primește automat toți parametrii economici. Generează graficul sold cumulat pe 20 ani cu punct de amortizare.</p>
+          <div class="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg inline-block font-medium">← Primește: investiție, energie, preț, inflație, degradare</div>
+        </div>
+      </div>
+
     </div>
   </section>
 

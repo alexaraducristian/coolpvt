@@ -434,6 +434,19 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
     document.getElementById('res-energie-an20')!.textContent = `${energieAn20.toFixed(0)} kWh`;
     document.getElementById('res-energie-luna')!.textContent = `${energieLuna.toFixed(0)} kWh/lună`;
     document.getElementById('results')!.style.display = 'block';
+
+    // Salvează rezultatele în localStorage pentru pașii următori
+    localStorage.setItem('coolpvt-rezultate', JSON.stringify({
+      nrPanouri,
+      putereInstalata: parseFloat(putereInstalata.toFixed(2)),
+      supTotala: parseFloat(supTotala.toFixed(1)),
+      energieAn1: parseFloat(energieAn1.toFixed(0)),
+      energieAn20: parseFloat(energieAn20.toFixed(0)),
+      energieLuna: parseFloat(energieLuna.toFixed(0)),
+      puterePanel: parseFloat((puterePanel * 1000).toFixed(0)),
+      degAnual,
+      randPV,
+    }));
   }
 
   // Butonul principal de calcul

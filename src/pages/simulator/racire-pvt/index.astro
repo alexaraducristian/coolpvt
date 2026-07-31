@@ -56,6 +56,15 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
 </SimulatorLayout>
 
 <script>
+  // Pre-fill din localStorage (rezultate dimensionare)
+  const savedRez = localStorage.getItem('coolpvt-rezultate');
+  if (savedRez) {
+    try {
+      const data = JSON.parse(savedRez);
+      if (data.nrPanouri) (document.getElementById('nr-pvt') as HTMLInputElement).value = data.nrPanouri.toString();
+    } catch(e) {}
+  }
+
   // Date temperatura iesire apa pe ora (12 ore/zi) per tip acoperis
   // Extras din RacirePVT.cs - aplicatia originala
   const tempData: Record<string, Record<string, number[]>> = {
