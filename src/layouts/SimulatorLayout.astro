@@ -18,17 +18,6 @@ const steps = [
   { id: 'economic', label: 'Analiză Economică', icon: '💰', href: `${base}/economic/` },
   { id: 'grafic', label: 'Grafic Amortizare', icon: '📊', href: `${base}/grafic/` },
 ];
-
-// Arrows between steps showing data flow direction
-// 'down' = normal forward flow, 'up' = data flows back, 'both' = bidirectional
-const arrows = [
-  { type: 'down', label: 'consum' },       // consumatori → dimensionare... wait
-  { type: 'down', label: 'panouri, kWp' }, // dimensionare → calcul-electric
-  { type: 'down' },                         // calcul-electric → racire-pv
-  { type: 'up', label: 'coef. răcire' },   // racire-pv → (back to dimensionare)
-  { type: 'down', label: 'nr. panouri' },  // racire-pvt → economic
-  { type: 'down', label: 'investiție' },   // economic → grafic
-];
 ---
 
 <Layout title={title} activeNav="simulator">
@@ -40,24 +29,10 @@ const arrows = [
       </div>
       <nav class="step-nav">
         {steps.map((step, i) => (
-          <>
-            <a href={step.href} class={`step-link ${activeStep === step.id ? 'active' : ''}`}>
-              <span class="step-icon">{step.icon}</span>
-              <span class="step-label">{step.label}</span>
-            </a>
-            {i < steps.length - 1 && (
-              <div class={`flow-arrow ${arrows[i]?.type === 'up' ? 'arrow-up' : 'arrow-down'}`}>
-                <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true">
-                  {arrows[i]?.type === 'up' ? (
-                    <path d="M6 14 L6 3 M2 7 L6 1 L10 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                  ) : (
-                    <path d="M6 0 L6 11 M2 7 L6 13 L10 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                  )}
-                </svg>
-                {arrows[i]?.label && <span class="flow-label">{arrows[i].label}</span>}
-              </div>
-            )}
-          </>
+          <a href={step.href} class={`step-link ${activeStep === step.id ? 'active' : ''}`}>
+            <span class="step-icon">{step.icon}</span>
+            <span class="step-label">{step.label}</span>
+          </a>
         ))}
       </nav>
     </aside>
@@ -140,36 +115,13 @@ const arrows = [
   .step-icon { font-size: 0.9rem; flex-shrink: 0; }
   .step-label { flex: 1; }
 
-  .flow-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
-    padding: 0.15rem 0;
-    margin-left: 0.65rem;
-  }
-
-  .flow-arrow.arrow-down { color: var(--color-primary-light); }
-  .flow-arrow.arrow-up { color: var(--color-accent); }
-
-  .flow-label {
-    font-size: 0.6rem;
-    color: var(--color-text-muted);
-    font-weight: 500;
-    opacity: 0.8;
-    white-space: nowrap;
-  }
-
   .content { min-width: 0; }
 
   @media (max-width: 768px) {
     .simulator-layout { grid-template-columns: 1fr; }
     .sidebar { position: static; }
-    .step-nav { flex-direction: row; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+    .step-nav { flex-direction: row; flex-wrap: wrap; gap: 0.3rem; }
     .step-link { font-size: 0.75rem; padding: 0.4rem 0.5rem; }
     .step-icon { display: none; }
-    .flow-arrow { margin-left: 0; padding: 0 0.1rem; }
-    .flow-arrow svg { width: 10px; height: 10px; transform: rotate(-90deg); }
-    .flow-label { display: none; }
   }
 </style>
