@@ -66,12 +66,40 @@ const siteBase = 'https://www.alexavolt.ro';
           <a href={`${base}/simulator/`} class="px-3 py-2 rounded-xl text-sm font-black uppercase tracking-tight bg-blue-600 text-white shadow-lg">
             ☀️ Simulator
           </a>
-          <a href={`${siteBase}/`} class="px-3 py-2 rounded-xl text-sm font-black text-emerald-700">
-            ←
-          </a>
+          <button id="cpvt-menu-btn" class="w-9 h-9 flex flex-col items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200" aria-label="Meniu">
+            <span class="block w-5 h-0.5 bg-slate-700"></span>
+            <span class="block w-5 h-0.5 bg-slate-700 mt-1.5"></span>
+            <span class="block w-5 h-0.5 bg-slate-700 mt-1.5"></span>
+          </button>
         </div>
       </div>
     </header>
+
+    <!-- Mobile menu overlay -->
+    <div id="cpvt-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden md:hidden"></div>
+    <nav id="cpvt-drawer" class="fixed top-0 right-0 h-full w-64 bg-white z-[70] shadow-2xl transform translate-x-full transition-transform duration-300 md:hidden">
+      <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+        <span class="font-black text-lg"><span class="text-orange-600">Cool</span>PVT</span>
+        <button id="cpvt-menu-close" class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100" aria-label="Închide">✕</button>
+      </div>
+      <ul class="p-4 space-y-2">
+        <li><a href={`${base}/`} class="block px-4 py-3 rounded-xl font-bold hover:bg-slate-50">🏠 Acasă</a></li>
+        <li><a href={`${base}/simulator/`} class="block px-4 py-3 rounded-xl font-bold hover:bg-slate-50">☀️ Simulator</a></li>
+        <li><a href={`${base}/despre/`} class="block px-4 py-3 rounded-xl font-bold hover:bg-slate-50">📖 Despre</a></li>
+        <li class="border-t border-slate-100 pt-2 mt-2"><a href={`${siteBase}/`} class="block px-4 py-3 rounded-xl font-bold text-emerald-700 hover:bg-emerald-50">← AlexaVolt.ro</a></li>
+      </ul>
+    </nav>
+    <script>
+      const menuBtn = document.getElementById('cpvt-menu-btn');
+      const menuClose = document.getElementById('cpvt-menu-close');
+      const overlay = document.getElementById('cpvt-overlay');
+      const drawer = document.getElementById('cpvt-drawer');
+      function openDrawer() { drawer?.classList.remove('translate-x-full'); overlay?.classList.remove('hidden'); }
+      function closeDrawer() { drawer?.classList.add('translate-x-full'); overlay?.classList.add('hidden'); }
+      menuBtn?.addEventListener('click', openDrawer);
+      menuClose?.addEventListener('click', closeDrawer);
+      overlay?.addEventListener('click', closeDrawer);
+    </script>
 
     <main class="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-8">
       <slot />

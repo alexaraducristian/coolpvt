@@ -190,6 +190,9 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
       <a href="/simulator/calcul-electric/" class="btn-secondary">Calcul Electric →</a>
       <a href="/simulator/economic/" class="btn-secondary">Analiză Economică →</a>
     </div>
+    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #a7d7b8; text-align:center;">
+      <a href="https://www.alexavolt.ro/servicii/panouri-fotovoltaice/" style="color:#004D40; font-weight:600; font-size:0.85rem; text-decoration:none;">🛠️ Vrei montaj profesional? Contactează AlexaVolt →</a>
+    </div>
   </div>
 </SimulatorLayout>
 
@@ -354,7 +357,23 @@ import SimulatorLayout from '../../layouts/SimulatorLayout.astro';
 
   // Calcul dimensionare
   function calculeaza() {
-    const modalitate = (document.querySelector('input[name="modalitate"]:checked') as HTMLInputElement).value;
+    // Validare
+    const consumInput = document.getElementById('consum-lunar') as HTMLInputElement;
+    const putereInput = document.getElementById('putere-instalata') as HTMLInputElement;
+    const modalitateEl = document.querySelector('input[name="modalitate"]:checked') as HTMLInputElement;
+    if (!modalitateEl) return;
+    if (modalitateEl.value === 'consum' && (parseFloat(consumInput.value) <= 0 || isNaN(parseFloat(consumInput.value)))) {
+      consumInput.style.borderColor = '#ef4444';
+      consumInput.focus();
+      return;
+    } else { consumInput.style.borderColor = ''; }
+    if (modalitateEl.value === 'putere' && (parseFloat(putereInput.value) <= 0 || isNaN(parseFloat(putereInput.value)))) {
+      putereInput.style.borderColor = '#ef4444';
+      putereInput.focus();
+      return;
+    } else { putereInput.style.borderColor = ''; }
+
+    const modalitate = modalitateEl.value;
     const consumLunar = parseFloat((document.getElementById('consum-lunar') as HTMLInputElement).value) || 300;
     const putereDorita = parseFloat((document.getElementById('putere-instalata') as HTMLInputElement).value) || 5;
     const randInvertor = parseFloat((document.getElementById('randament-invertor') as HTMLInputElement).value) || 0.97;

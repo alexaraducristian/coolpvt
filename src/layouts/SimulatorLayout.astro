@@ -120,7 +120,7 @@ const steps = [
   @media (max-width: 768px) {
     .simulator-layout { grid-template-columns: 1fr; }
     .sidebar { position: static; }
-    .step-nav { flex-direction: row; flex-wrap: wrap; gap: 0.3rem; }
+    .step-nav { flex-direction: row; flex-wrap: nowrap; gap: 0.3rem; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 0.5rem; }
     .step-link { font-size: 0.75rem; padding: 0.4rem 0.5rem; }
     .step-icon { display: none; }
   }
