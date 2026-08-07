@@ -71,6 +71,12 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
       <div class="res"><span>Secțiune conductor solar</span><strong id="r-scond-solar">—</strong></div>
       <div class="res"><span>Secțiune conductor AC</span><strong id="r-scond-ac">—</strong></div>
     </div>
+
+    <div class="next-steps">
+      <p>Continuați cu:</p>
+      <a href="/simulator/racire-pv/" class="btn-secondary">💨 Răcire PV →</a>
+      <a href="/simulator/economic/" class="btn-secondary">💰 Analiză Economică →</a>
+    </div>
   </div>
 </SimulatorLayout>
 
@@ -152,4 +158,8 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
   .res { background: #f8fafc; padding: 0.75rem; border-radius: 8px; border: 1px solid #e2e8f0; }
   .res span { display: block; font-size: 0.75rem; color: var(--color-text-muted); }
   .res strong { font-size: 1.1rem; color: var(--color-primary-dark); }
+  .next-steps { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+  .next-steps p { font-weight: 500; color: var(--color-text-muted); font-size: 0.85rem; }
+  .btn-secondary { display: inline-block; padding: 0.5rem 1rem; background: var(--color-surface); color: var(--color-primary); border-radius: var(--radius); text-decoration: none; font-weight: 500; font-size: 0.85rem; border: 1px solid var(--color-border); transition: all 0.2s; }
+  .btn-secondary:hover { background: var(--color-primary); color: white; border-color: var(--color-primary); }
 </style>
