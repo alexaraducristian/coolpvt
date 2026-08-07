@@ -83,7 +83,9 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
         <tbody id="tbl-eco-body"></tbody>
       </table>
     </div>
-    <p class="note">→ <a href="#" id="link-grafic">Continuați la Grafic Amortizare pentru vizualizare</a></p>
+    <p class="note" style="text-align:center; margin-top:1.5rem;">
+      <a href="#" id="link-grafic" class="btn-grafic">📊 Continuați la Grafic Amortizare →</a>
+    </p>
   </div>
 </SimulatorLayout>
 
@@ -96,6 +98,43 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
       if (data.nrPanouri) (document.getElementById('nr-panouri') as HTMLInputElement).value = data.nrPanouri.toString();
       if (data.energieAn1) (document.getElementById('energie-an') as HTMLInputElement).value = data.energieAn1.toString();
       if (data.degAnual) (document.getElementById('degradare') as HTMLInputElement).value = data.degAnual.toFixed(2);
+    } catch(e) {}
+  }
+
+  // Pre-fill din localStorage (rezultate calcul electric)
+  const savedElectric = localStorage.getItem('coolpvt-calcul-electric');
+  if (savedElectric) {
+    try {
+      const elData = JSON.parse(savedElectric);
+      // Estimare preț invertor pe baza puterii (RON, valori orientative 2026)
+      if (elData.putereInvertor) {
+        const p = elData.putereInvertor;
+        let pretInv = 5000; // default
+        if (p <= 3) pretInv = 3500;
+        else if (p <= 5) pretInv = 5000;
+        else if (p <= 8) pretInv = 7000;
+        else if (p <= 10) pretInv = 9000;
+        else pretInv = 11000;
+        (document.getElementById('pret-invertor') as HTMLInputElement).value = pretInv.toString();
+      }
+      // Estimare cost materiale electrice pe baza secțiunilor
+      if (elData.sectiuneSolar) {
+        const s = elData.sectiuneSolar;
+        let costMat = 1500; // default
+        if (s >= 10) costMat = 2000;
+        if (s >= 16) costMat = 2500;
+        (document.getElementById('pret-materiale') as HTMLInputElement).value = costMat.toString();
+      }
+    } catch(e) {}
+  }
+
+  // Pre-fill din localStorage (energie termică PVT)
+  let energieTermicaAn = 0;
+  const savedPVT = localStorage.getItem('coolpvt-racire-pvt');
+  if (savedPVT) {
+    try {
+      const pvtData = JSON.parse(savedPVT);
+      if (pvtData.energieTermicaSezon) energieTermicaAn = pvtData.energieTermicaSezon;
     } catch(e) {}
   }
 
@@ -121,7 +160,9 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
     for (let i = 1; i <= 20; i++) {
       const energieAni = energieAn * (1 - degradare * i);
       const pretKwhAn = pretKwh * Math.pow(1 + inflatie, i);
-      const economieAn = energieAni * pretKwhAn;
+      // Economie electrică + economie termică (echivalent kWh termic la preț gaz ~0.7 din preț electric)
+      const economieTermica = energieTermicaAn * pretKwhAn * 0.7;
+      const economieAn = energieAni * pretKwhAn + economieTermica;
       cumulEconomii += economieAn;
       const sold = cumulEconomii - investitie;
       if (sold >= 0 && anAmortizare === 20 && i < 20) anAmortizare = i;
@@ -170,4 +211,6 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
   .positive td { border-bottom-color: #c8e6d0; }
   .note { margin-top: 1rem; font-size: 0.9rem; color: var(--color-text-muted); }
   .note a { color: var(--color-primary); }
+  .btn-grafic { display: inline-block; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%); color: white !important; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 700; font-size: 1rem; text-decoration: none; box-shadow: 0 4px 14px rgba(15,76,129,0.3); transition: all 0.2s; }
+  .btn-grafic:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(15,76,129,0.4); }
 </style>

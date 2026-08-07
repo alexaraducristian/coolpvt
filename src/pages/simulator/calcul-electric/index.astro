@@ -140,6 +140,14 @@ import SimulatorLayout from '../../../layouts/SimulatorLayout.astro';
     document.getElementById('r-scond-solar')!.textContent = sCondSolar + ' mm²';
     document.getElementById('r-scond-ac')!.textContent = sCondAC + ' mm²';
     document.getElementById('results')!.style.display = 'block';
+
+    // Salvează rezultatele în localStorage pentru Analiza Economică
+    localStorage.setItem('coolpvt-calcul-electric', JSON.stringify({
+      putereInvertor: parseFloat(pinst.toFixed(2)),
+      sectiuneSolar: parseInt(sCondSolar),
+      sectiuneAC: parseInt(sCondAC),
+      vmaxDC: parseFloat(vmaxDC),
+    }));
   });
 </script>
 
